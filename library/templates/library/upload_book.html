@@ -1,0 +1,84 @@
+{% extends 'library/base.html' %} {% block title %}Upload Book - AcademiaLink
+Library{% endblock %} {% block content %}
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="mb-0"><i class="fas fa-upload"></i> Upload New Book</h4>
+        </div>
+        <div class="card-body">
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="{{ form.title.id_for_label }}" class="form-label"
+                  >Book Title *</label
+                >
+                {{ form.title }} {% if form.title.errors %}
+                <div class="text-danger">{{ form.title.errors }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="{{ form.author.id_for_label }}" class="form-label"
+                  >Author *</label
+                >
+                {{ form.author }} {% if form.author.errors %}
+                <div class="text-danger">{{ form.author.errors }}</div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="{{ form.category.id_for_label }}" class="form-label"
+                >Category *</label
+              >
+              {{ form.category }} {% if form.category.errors %}
+              <div class="text-danger">{{ form.category.errors }}</div>
+              {% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label
+                for="{{ form.description.id_for_label }}"
+                class="form-label"
+                >Description</label
+              >
+              {{ form.description }} {% if form.description.errors %}
+              <div class="text-danger">{{ form.description.errors }}</div>
+              {% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label for="files" class="form-label">Book Files *</label>
+              <input
+                type="file"
+                name="files"
+                id="files"
+                class="form-control"
+                multiple
+                accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
+              />
+              <div class="form-text">
+                Upload multiple files (PDF, DOC, DOCX, TXT, JPG, PNG)
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between">
+              <a
+                href="{% url 'library:teacher_dashboard' %}"
+                class="btn btn-secondary"
+              >
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+              </a>
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-upload"></i> Upload Book
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

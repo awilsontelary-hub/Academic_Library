@@ -1,0 +1,177 @@
+{% extends 'library/base.html' %}
+
+{% block title %}Teacher Dashboard - AcademiaLink Library{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">Teacher Dashboard</h1>
+            <p class="text-muted">Welcome back, {{ user.full_name }}!</p>
+        </div>
+    </div>
+    
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-book fa-2x text-primary mb-2"></i>
+                    <h4>{{ total_books }}</h4>
+                    <p class="text-muted">Total Books</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-hand-holding fa-2x text-success mb-2"></i>
+                    <h4>{{ total_borrows }}</h4>
+                    <p class="text-muted">Total Borrows</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-clock fa-2x text-warning mb-2"></i>
+                    <h4>{{ pending_borrows.count }}</h4>
+                    <p class="text-muted">Pending Requests</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-users fa-2x text-info mb-2"></i>
+                    <h4>50+</h4>
+                    <p class="text-muted">Active Students</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Pending Borrow Requests -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-clock"></i> Pending Borrow Requests
+                    </h5>
+                    <a href="{% url 'library:manage_borrows' %}" class="btn btn-sm btn-outline-primary">
+                        View All
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if pending_borrows %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Student</th>
+                                        <th>Book Title</th>
+                                        <th>Request Date</th>
+                                        <th>Due Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for borrow in pending_borrows %}
+                                        <tr>
+                                            <td>{{ borrow.borrower.full_name }}</td>
+                                            <td>{{ borrow.book.title }}</td>
+                                            <td>{{ borrow.borrowed_date|date:"M d, Y" }}</td>
+                                            <td>{{ borrow.due_date|date:"M d, Y" }}</td>
+                                            <td>
+                                                <form method="post" action="{% url 'library:approve_borrow' borrow.id %}" class="d-inline">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-sm btn-success">
+                                                        <i class="fas fa-check"></i> Approve
+                                                    </button>
+                                                </form>
+                                                <form method="post" action="{% url 'library:reject_borrow' borrow.id %}" class="d-inline">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-sm btn-danger">
+                                                        <i class="fas fa-times"></i> Reject
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                            <h5>All caught up!</h5>
+                            <p class="text-muted">No pending borrow requests at the moment.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions & Recent Activity -->
+        <div class="col-lg-4">
+            <!-- Quick Actions -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bolt"></i> Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'library:upload_book' %}" class="btn btn-primary">
+                            <i class="fas fa-upload"></i> Upload New Book
+                        </a>
+                        <a href="{% url 'library:manage_borrows' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-list"></i> Manage All Borrows
+                        </a>
+                        <a href="{% url 'library:book_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-search"></i> Browse Books
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Activity -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-history"></i> Recent Activity
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if all_borrows %}
+                        {% for borrow in all_borrows|slice:":5" %}
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">{{ borrow.book.title }}</h6>
+                                    <small class="text-muted">
+                                        {{ borrow.borrower.full_name }} - 
+                                        {% if borrow.status == 'pending' %}
+                                            <span class="text-warning">Pending</span>
+                                        {% elif borrow.status == 'approved' %}
+                                            <span class="text-success">Approved</span>
+                                        {% elif borrow.status == 'rejected' %}
+                                            <span class="text-danger">Rejected</span>
+                                        {% elif borrow.status == 'returned' %}
+                                            <span class="text-secondary">Returned</span>
+                                        {% endif %}
+                                    </small>
+                                </div>
+                                <small class="text-muted">{{ borrow.borrowed_date|date:"M d" }}</small>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No recent activity.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends 'library/base.html' %}
+
+{% block title %}Borrow {{ book.title }} - AcademiaLink Library{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="fas fa-hand-holding"></i> Borrow Book
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5>{{ book.title }}</h5>
+                        <p class="text-muted">by {{ book.author }}</p>
+                        <p>{{ book.description|truncatewords:30 }}</p>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="{{ form.notes.id_for_label }}" class="form-label">Notes (Optional)</label>
+                            {{ form.notes }}
+                            {% if form.notes.errors %}
+                                <div class="text-danger">{{ form.notes.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Note:</strong> Your borrow request will be reviewed by a teacher before approval. 
+                            You'll be notified once it's approved or rejected.
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'library:book_detail' book.id %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Book
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-hand-holding"></i> Submit Request
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

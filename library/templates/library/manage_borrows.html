@@ -1,0 +1,87 @@
+{% extends 'library/base.html' %}
+
+{% block title %}Manage Borrows - AcademiaLink Library{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">Manage Book Borrows</h1>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-list"></i> All Borrow Requests
+            </h5>
+        </div>
+        <div class="card-body">
+            {% if borrows %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Book Title</th>
+                                <th>Request Date</th>
+                                <th>Due Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for borrow in borrows %}
+                                <tr>
+                                    <td>{{ borrow.borrower.full_name }}</td>
+                                    <td>{{ borrow.book.title }}</td>
+                                    <td>{{ borrow.borrowed_date|date:"M d, Y" }}</td>
+                                    <td>{{ borrow.due_date|date:"M d, Y" }}</td>
+                                    <td>
+                                        {% if borrow.status == 'pending' %}
+                                            <span class="badge bg-warning">Pending</span>
+                                        {% elif borrow.status == 'approved' %}
+                                            <span class="badge bg-success">Approved</span>
+                                        {% elif borrow.status == 'rejected' %}
+                                            <span class="badge bg-danger">Rejected</span>
+                                        {% elif borrow.status == 'returned' %}
+                                            <span class="badge bg-secondary">Returned</span>
+                                        {% elif borrow.status == 'overdue' %}
+                                            <span class="badge bg-danger">Overdue</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if borrow.status == 'pending' %}
+                                            <form method="post" action="{% url 'library:approve_borrow' borrow.id %}" class="d-inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-success">
+                                                    <i class="fas fa-check"></i> Approve
+                                                </button>
+                                            </form>
+                                            <form method="post" action="{% url 'library:reject_borrow' borrow.id %}" class="d-inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-danger">
+                                                    <i class="fas fa-times"></i> Reject
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                        <a href="{% url 'library:book_detail' borrow.book.id %}" class="btn btn-sm btn-outline-info">
+                                            <i class="fas fa-eye"></i> View Book
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-list fa-3x text-muted mb-3"></i>
+                    <h5>No borrow requests</h5>
+                    <p class="text-muted">No books have been borrowed yet.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
