@@ -1,17 +1,15 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import FileResponse, HttpResponseForbidden, JsonResponse
+from django.http import FileResponse, HttpResponseForbidden
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q, Avg
 from django.utils import timezone
-from datetime import timedelta
 from apps.accounts.decorators import teacher_required, student_required
 from apps.accounts.models import User
-from .models import BookDetails, BookFile, BookBorrow, BookReview, Category, Recommendation
+from .models import BookDetails, BookFile, BookBorrow, BookReview, Category
 from .forms import BookUploadForm, BookBorrowForm, BookReviewForm, BookSearchForm
 from django.views.decorators.http import require_POST
-import json
 
 def home_view(request):
     """Home page with featured books and statistics"""
@@ -103,31 +101,91 @@ def book_detail(request, book_id):
     
     # Check if user can borrow this book
     can_borrow = False
+    has_approved_access = False
     if request.user.is_authenticated and request.user.student:
         existing_borrow = BookBorrow.objects.filter(book=book, borrower=request.user, status__in=['pending', 'approved']).exists()
         can_borrow = not existing_borrow
+        
+        # Check if user has approved access to this book
+        has_approved_access = BookBorrow.objects.filter(
+            book=book, 
+            borrower=request.user, 
+            status='approved'
+        ).exists()
     
     context = {
         'book': book,
         'reviews': reviews,
         'avg_rating': avg_rating,
         'can_borrow': can_borrow,
+        'has_approved_access': has_approved_access,
     }
     return render(request, 'library/book_detail.html', context)
 
 @login_required
 def download_book_file(request, file_id):
-    """Secure book file download"""
+    """Secure book file download - only for approved borrowers"""
     book_file = get_object_or_404(BookFile, id=file_id)
     
-    # Check if user has access to this book
+    # Check if user has approved access to this book
     if not request.user.is_authenticated:
         return HttpResponseForbidden("You must be logged in.")
+    
+    # Check if user has an approved borrow for this book
+    has_access = BookBorrow.objects.filter(
+        book=book_file.book,
+        borrower=request.user,
+        status='approved'
+    ).exists()
+    
+    if not has_access:
+        return HttpResponseForbidden("You don't have permission to download this book. Please borrow it first.")
     
     # Log the download
     # You could add download tracking here
     
     return FileResponse(book_file.file, as_attachment=True)
+
+@login_required
+def preview_book_file(request, file_id):
+    """Preview book file in browser - only for approved borrowers"""
+    book_file = get_object_or_404(BookFile, id=file_id)
+    
+    # Check if user has approved access to this book
+    if not request.user.is_authenticated:
+        return HttpResponseForbidden("You must be logged in.")
+    
+    # Check if user has an approved borrow for this book
+    has_access = BookBorrow.objects.filter(
+        book=book_file.book,
+        borrower=request.user,
+        status='approved'
+    ).exists()
+    
+    if not has_access:
+        return HttpResponseForbidden("You don't have permission to preview this book. Please borrow it first.")
+    
+    # Get file extension to determine if it's previewable
+    file_extension = book_file.file.name.split('.')[-1].lower()
+    
+    # Only allow preview for certain file types
+    previewable_extensions = ['pdf', 'jpg', 'jpeg', 'png', 'txt']
+    
+    if file_extension not in previewable_extensions:
+        return HttpResponseForbidden("This file type cannot be previewed.")
+    
+    # For PDF files, serve inline; for images and text, also serve inline
+    if file_extension == 'pdf':
+        response = FileResponse(book_file.file, content_type='application/pdf')
+        response['Content-Disposition'] = f'inline; filename="{book_file.file.name.split("/")[-1]}"'
+    elif file_extension in ['jpg', 'jpeg', 'png']:
+        response = FileResponse(book_file.file, content_type=f'image/{file_extension}')
+        response['Content-Disposition'] = f'inline; filename="{book_file.file.name.split("/")[-1]}"'
+    elif file_extension == 'txt':
+        response = FileResponse(book_file.file, content_type='text/plain')
+        response['Content-Disposition'] = f'inline; filename="{book_file.file.name.split("/")[-1]}"'
+    
+    return response
 
 @login_required
 @teacher_required

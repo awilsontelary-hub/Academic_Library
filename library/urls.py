@@ -22,6 +22,7 @@ urlpatterns = [
     path("borrows/<int:borrow_id>/approve/", views.approve_borrow, name="approve_borrow"),
     path("borrows/<int:borrow_id>/reject/", views.reject_borrow, name="reject_borrow"),
     
-    # File downloads
+    # File downloads and previews
     path("download/<int:file_id>/", views.download_book_file, name="download_book"),
+    path("preview/<int:file_id>/", views.preview_book_file, name="preview_book"),
 ]
