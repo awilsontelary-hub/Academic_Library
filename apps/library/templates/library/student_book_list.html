@@ -1,0 +1,680 @@
+{% extends 'library/base.html' %}
+
+{% block title %}Books - AcademiaLink Library{% endblock %}
+
+{% block content %}
+<style>
+/* Custom Library Theme CSS for Student Book List */
+:root {
+    --library-primary: #1e3a8a;
+    --library-secondary: #3b82f6;
+    --library-light: #dbeafe;
+    --library-accent: #0ea5e9;
+    --library-gradient: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #0ea5e9 100%);
+    --library-text: #1e293b;
+    --library-muted: #64748b;
+    --library-success: #059669;
+    --library-warning: #d97706;
+}
+
+body {
+    background: linear-gradient(to bottom, #f8fafc, #e2e8f0);
+    min-height: 100vh;
+}
+
+.books-hero {
+    background: var(--library-gradient);
+    padding: 3rem 0;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.books-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="library-pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><rect fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5" width="20" height="20"/><path fill="rgba(255,255,255,0.05)" d="M2 5h3v10h-3zm6 0h3v10h-3zm6 0h3v10h-3z"/></pattern></defs><rect width="100" height="100" fill="url(%23library-pattern)"/></svg>') repeat;
+    opacity: 0.3;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    color: white;
+    text-align: center;
+}
+
+.search-card {
+    background: white;
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(30, 58, 138, 0.15);
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.search-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--library-gradient);
+}
+
+.search-card .card-body {
+    padding: 2rem;
+}
+
+.form-control {
+    border: 2px solid var(--library-light);
+    border-radius: 15px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: var(--library-primary);
+    box-shadow: 0 0 0 0.2rem rgba(30, 58, 138, 0.25);
+    transform: translateY(-2px);
+}
+
+.form-select {
+    border: 2px solid var(--library-light);
+    border-radius: 15px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-select:focus {
+    border-color: var(--library-primary);
+    box-shadow: 0 0 0 0.2rem rgba(30, 58, 138, 0.25);
+}
+
+.btn-search {
+    background: var(--library-gradient);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 12px;
+    border-radius: 15px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
+}
+
+.btn-search:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(30, 58, 138, 0.4);
+    color: white;
+}
+
+.book-card {
+    background: white;
+    border: none;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(30, 58, 138, 0.1);
+}
+
+.book-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--library-gradient);
+}
+
+.book-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 25px 50px rgba(30, 58, 138, 0.2);
+}
+
+.book-card .card-body {
+    padding: 2rem;
+}
+
+.book-card .card-title {
+    color: var(--library-primary);
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.rating-stars {
+    color: #fbbf24;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}
+
+.rating-stars .fas {
+    text-shadow: 0 1px 3px rgba(251, 191, 36, 0.3);
+}
+
+.enhanced-badge {
+    background: var(--library-gradient) !important;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 0.85rem;
+}
+
+.btn-detail {
+    background: linear-gradient(45deg, #e0f2fe, #b3e5fc);
+    color: var(--library-primary);
+    border: 2px solid var(--library-light);
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.btn-detail:hover {
+    background: var(--library-primary);
+    color: white;
+    transform: scale(1.05);
+    text-decoration: none;
+}
+
+.btn-download {
+    background: linear-gradient(45deg, #059669, #10b981);
+    border: none;
+    color: white;
+    font-weight: 500;
+    padding: 0.4rem 0.8rem;
+    border-radius: 15px;
+    transition: all 0.3s ease;
+    margin-right: 0.3rem;
+    margin-bottom: 0.3rem;
+    text-decoration: none;
+}
+
+.btn-download:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(5, 150, 105, 0.3);
+    color: white;
+    text-decoration: none;
+}
+
+.no-books-found {
+    background: white;
+    border: 2px dashed var(--library-light);
+    border-radius: 20px;
+    padding: 4rem 2rem;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(30, 58, 138, 0.05);
+}
+
+.pagination {
+    margin-top: 3rem;
+}
+
+.page-link {
+    color: var(--library-primary);
+    border: 2px solid var(--library-light);
+    border-radius: 15px !important;
+    padding: 0.75rem 1rem;
+    margin: 0 0.2rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.page-link:hover {
+    background: var(--library-primary);
+    border-color: var(--library-primary);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.page-item.active .page-link {
+    background: var(--library-gradient);
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
+}
+
+.fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease;
+}
+
+.fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.books-grid {
+    margin-top: 2rem;
+}
+
+.search-section-title {
+    color: var(--library-primary);
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.search-section-title::after {
+    content: '';
+    flex: 1;
+    height: 2px;
+    background: var(--library-gradient);
+    border-radius: 2px;
+}
+
+.results-info {
+    background: linear-gradient(45deg, #f8fafc, #e2e8f0);
+    border-radius: 15px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    border-left: 4px solid var(--library-primary);
+    color: var(--library-text);
+}
+
+/* Animation for cards */
+.book-card {
+    animation-delay: calc(var(--animation-order) * 0.1s);
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .books-hero {
+        padding: 2rem 0;
+    }
+    
+    .search-card .card-body {
+        padding: 1.5rem;
+    }
+    
+    .book-card .card-body {
+        padding: 1.5rem;
+    }
+}
+</style>
+
+<!-- Hero Section -->
+<section class="books-hero">
+    <div class="container">
+        <div class="hero-content fade-in">
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb justify-content-center" style="background: transparent;">
+                    <li class="breadcrumb-item"><a href="{% url 'library:home' %}" class="text-white opacity-75">Home</a></li>
+                    <li class="breadcrumb-item active text-white" aria-current="page">Book Library</li>
+                </ol>
+            </nav>
+            <h1 class="display-4 fw-bold mb-3">Explore Our Digital Library</h1>
+            <p class="lead opacity-90">Discover thousands of academic resources at your fingertips</p>
+        </div>
+    </div>
+</section>
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <!-- Search Section -->
+            <div class="search-card fade-in">
+                <div class="card-body">
+                    <h4 class="search-section-title">
+                        <i class="fas fa-search"></i>
+                        Find Your Perfect Book
+                    </h4>
+                    <form method="get" class="row g-3">
+                        <div class="col-lg-6 col-md-8">
+                            <div class="position-relative">
+                                <input type="text" name="query" class="form-control" placeholder="Search by title, author, or keywords..." value="{{ search_form.query.value|default:'' }}">
+                                <i class="fas fa-search position-absolute" style="right: 15px; top: 50%; transform: translateY(-50%); color: var(--library-muted);"></i>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-3">
+                            <select name="category" class="form-select">
+                                <option value="">All Categories</option>
+                                {% for category in categories %}
+                                    <option value="{{ category.id }}" {% if search_form.category.value == category.id %}selected{% endif %}>
+                                        {{ category.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-lg-2 col-md-1">
+                            <button type="submit" class="btn btn-search w-100">
+                                <i class="fas fa-search"></i>
+                                <span class="d-none d-md-inline ms-1">Search</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Results Information -->
+            {% if books %}
+                <div class="results-info fade-in">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-book me-2"></i>
+                            <strong>{{ books.paginator.count }}</strong> book{{ books.paginator.count|pluralize }} found
+                            {% if search_form.query.value %}
+                                for "<em>{{ search_form.query.value }}</em>"
+                            {% endif %}
+                        </div>
+                        <div class="text-muted">
+                            Page {{ books.number }} of {{ books.paginator.num_pages }}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            
+            <!-- Books Grid -->
+            <div class="books-grid">
+                <div class="row">
+                    {% for book in books %}
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="card book-card h-100 fade-in" style="--animation-order: {{ forloop.counter }};">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ book.title }}</h5>
+                                    <p class="card-text text-muted mb-2">
+                                        <i class="fas fa-user-edit me-1"></i>by {{ book.author }}
+                                    </p>
+                                    <p class="card-text" style="color: var(--library-text); line-height: 1.6;">
+                                        {{ book.description|truncatewords:20 }}
+                                    </p>
+                                    
+                                    {% if book.avg_rating > 0 %}
+                                        <div class="rating-section mb-3">
+                                            <span class="rating-stars">
+                                                {% for i in "12345" %}
+                                                    {% if forloop.counter <= book.avg_rating %}
+                                                        <i class="fas fa-star"></i>
+                                                    {% else %}
+                                                        <i class="far fa-star"></i>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </span>
+                                            <small class="text-muted ms-1">({{ book.avg_rating|floatformat:1 }}/5)</small>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <span class="enhanced-badge">
+                                            <i class="fas fa-tag me-1"></i>{{ book.category.name }}
+                                        </span>
+                                        <a href="{% url 'library:book_detail' book.id %}" class="btn btn-detail">
+                                            <i class="fas fa-eye me-1"></i>View Details
+                                        </a>
+                                    </div>
+                                    
+                                    {% if book.files.all %}
+                                        <div class="download-section pt-3" style="border-top: 1px solid var(--library-light);">
+                                            <small class="text-muted d-block mb-2">
+                                                <i class="fas fa-download me-1"></i>Available Downloads:
+                                            </small>
+                                            <div class="download-buttons">
+                                                {% for file in book.files.all %}
+                                                    <a href="{% url 'library:download_book' file.id %}" class="btn btn-download btn-sm">
+                                                        <i class="fas fa-download me-1"></i>{{ file.file.name|slice:"7:"|truncatechars:15 }}
+                                                    </a>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="col-12">
+                            <div class="no-books-found fade-in">
+                                <i class="fas fa-search fa-4x mb-4" style="color: var(--library-light);"></i>
+                                <h4 style="color: var(--library-primary);">No books found</h4>
+                                <p class="text-muted mb-4">We couldn't find any books matching your search criteria.</p>
+                                <div class="suggestions">
+                                    <h6 style="color: var(--library-primary);">Try:</h6>
+                                    <ul class="list-unstyled text-muted">
+                                        <li><i class="fas fa-check me-2"></i>Using different keywords</li>
+                                        <li><i class="fas fa-check me-2"></i>Checking your spelling</li>
+                                        <li><i class="fas fa-check me-2"></i>Selecting a different category</li>
+                                        <li><i class="fas fa-check me-2"></i>Browsing all available books</li>
+                                    </ul>
+                                </div>
+                                <a href="{% url 'library:book_list' %}" class="btn btn-search mt-3">
+                                    <i class="fas fa-book me-2"></i>Browse All Books
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Enhanced Pagination -->
+            {% if books.has_other_pages %}
+                <nav aria-label="Page navigation" class="fade-in">
+                    <ul class="pagination justify-content-center">
+                        {% if books.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ books.previous_page_number }}{% if search_form.query.value %}&query={{ search_form.query.value }}{% endif %}{% if search_form.category.value %}&category={{ search_form.category.value }}{% endif %}">
+                                    <i class="fas fa-chevron-left me-1"></i>Previous
+                                </a>
+                            </li>
+                        {% endif %}
+                        
+                        {% for num in books.paginator.page_range %}
+                            {% if num == books.number %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% elif num > books.number|add:'-3' and num < books.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}{% if search_form.query.value %}&query={{ search_form.query.value }}{% endif %}{% if search_form.category.value %}&category={{ search_form.category.value }}{% endif %}">{{ num }}</a>
+                                </li>
+                            {% elif num == 1 %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1{% if search_form.query.value %}&query={{ search_form.query.value }}{% endif %}{% if search_form.category.value %}&category={{ search_form.category.value }}{% endif %}">1</a>
+                                </li>
+                                {% if books.number > 4 %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                {% endif %}
+                            {% elif num == books.paginator.num_pages %}
+                                {% if books.number < books.paginator.num_pages|add:'-3' %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                {% endif %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ books.paginator.num_pages }}{% if search_form.query.value %}&query={{ search_form.query.value }}{% endif %}{% if search_form.category.value %}&category={{ search_form.category.value }}{% endif %}">{{ books.paginator.num_pages }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if books.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ books.next_page_number }}{% if search_form.query.value %}&query={{ search_form.query.value }}{% endif %}{% if search_form.category.value %}&category={{ search_form.category.value }}{% endif %}">
+                                    Next<i class="fas fa-chevron-right ms-1"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                    
+                    <!-- Page info -->
+                    <div class="text-center mt-3">
+                        <small class="text-muted">
+                            Showing {{ books.start_index }} to {{ books.end_index }} of {{ books.paginator.count }} results
+                        </small>
+                    </div>
+                </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+// JavaScript for enhanced interactions
+document.addEventListener('DOMContentLoaded', function() {
+    // Fade in animation on scroll
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, observerOptions);
+
+    // Observe all elements with fade-in class
+    document.querySelectorAll('.fade-in').forEach(el => {
+        observer.observe(el);
+    });
+
+    // Enhanced hover effects for book cards
+    document.querySelectorAll('.book-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-10px) scale(1.02)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+
+    // Search form enhancements
+    const searchInput = document.querySelector('input[name="query"]');
+    const searchForm = searchInput.closest('form');
+    
+    // Auto-submit on category change
+    document.querySelector('select[name="category"]').addEventListener('change', function() {
+        searchForm.submit();
+    });
+    
+    // Search input focus animation
+    searchInput.addEventListener('focus', function() {
+        this.parentElement.style.transform = 'scale(1.02)';
+    });
+    
+    searchInput.addEventListener('blur', function() {
+        this.parentElement.style.transform = 'scale(1)';
+    });
+
+    // Button click ripple effect
+    document.querySelectorAll('.btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            let ripple = document.createElement('span');
+            ripple.style.position = 'absolute';
+            ripple.style.borderRadius = '50%';
+            ripple.style.background = 'rgba(255, 255, 255, 0.6)';
+            ripple.style.transform = 'scale(0)';
+            ripple.style.animation = 'ripple-animation 0.6s linear';
+            ripple.style.pointerEvents = 'none';
+            
+            this.style.position = 'relative';
+            this.style.overflow = 'hidden';
+            this.appendChild(ripple);
+            
+            let rect = this.getBoundingClientRect();
+            let size = Math.max(rect.width, rect.height);
+            let x = e.clientX - rect.left - size / 2;
+            let y = e.clientY - rect.top - size / 2;
+            
+            ripple.style.width = size + 'px';
+            ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+
+    // Staggered animation for book cards
+    document.querySelectorAll('.book-card').forEach((card, index) => {
+        card.style.animationDelay = (index * 0.1) + 's';
+        card.style.animation = 'slideInUp 0.6s ease forwards';
+    });
+
+    // Smooth scroll for pagination
+    document.querySelectorAll('.pagination a').forEach(link => {
+        link.addEventListener('click', function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    });
+});
+</script>
+
+<style>
+/* Additional animations */
+@keyframes ripple-animation {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* Enhanced scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--library-gradient);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--library-primary);
+}
+
+/* Loading state for form submission */
+.form-loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+/* Enhanced focus states */
+.form-control:focus,
+.form-select:focus {
+    outline: none;
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+    transition: all 0.3s ease;
+}
+</style>
+{% endblock %}

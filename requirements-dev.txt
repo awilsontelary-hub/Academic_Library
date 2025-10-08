@@ -1,0 +1,17 @@
+# Development requirements
+# Install with: pip install -r requirements-dev.txt
+
+-r requirements.txt
+
+# Development tools
+django-debug-toolbar==4.2.0
+pytest-django==4.8.0
+black==23.12.1
+flake8==7.0.0
+isort==5.13.2
+
+# Testing
+factory-boy==3.3.1
+coverage==7.4.0
+selenium==4.15.2
+webdriver-manager==4.0.1

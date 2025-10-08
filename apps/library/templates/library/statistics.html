@@ -1,0 +1,846 @@
+{% extends 'library/base.html' %}
+
+{% block title %}Statistics Dashboard - AcademiaLink Library{% endblock %}
+
+{% block content %}
+<style>
+/* Statistics Dashboard Theme Variables */
+:root {
+    --library-primary: #1e3a8a;
+    --library-secondary: #3b82f6;
+    --library-accent: #0ea5e9;
+    --library-success: #059669;
+    --library-warning: #d97706;
+    --library-danger: #dc2626;
+    --library-light: #cbd5e1;
+    --library-dark: #334155;
+    --library-text: #1e293b;
+    --library-muted: #64748b;
+    --library-bg: #f8fafc;
+    --library-gradient: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    --library-gradient-light: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+}
+
+.stats-hero {
+    background: var(--library-gradient);
+    color: white;
+    padding: 3rem 0;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.stats-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+    opacity: 0.3;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+.stats-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(30, 58, 138, 0.1);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.stats-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--library-gradient);
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(30, 58, 138, 0.15);
+}
+
+.stats-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 1.8rem;
+    transition: all 0.3s ease;
+}
+
+.stats-icon.books { background: linear-gradient(45deg, #dbeafe, #bfdbfe); color: var(--library-primary); }
+.stats-icon.users { background: linear-gradient(45deg, #dcfce7, #bbf7d0); color: #059669; }
+.stats-icon.downloads { background: linear-gradient(45deg, #fef3c7, #fde68a); color: #d97706; }
+.stats-icon.borrows { background: linear-gradient(45deg, #fce7f3, #fbcfe8); color: #be185d; }
+
+.stats-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.stats-label {
+    color: var(--library-muted);
+    font-weight: 500;
+    margin: 0;
+}
+
+.detailed-stats-card {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    border: 1px solid rgba(30, 58, 138, 0.1);
+    margin-bottom: 1.5rem;
+}
+
+.section-title {
+    color: var(--library-primary);
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.metric-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid rgba(30, 58, 138, 0.1);
+}
+
+.metric-item:last-child {
+    border-bottom: none;
+}
+
+.metric-label {
+    color: var(--library-text);
+    font-weight: 500;
+}
+
+.metric-value {
+    color: var(--library-primary);
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.recent-activity {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid rgba(30, 58, 138, 0.1);
+    transition: background 0.3s ease;
+}
+
+.activity-item:hover {
+    background: rgba(30, 58, 138, 0.05);
+}
+
+.activity-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-size: 1rem;
+}
+
+.activity-icon.download {
+    background: linear-gradient(45deg, #fef3c7, #fde68a);
+    color: #d97706;
+}
+
+.activity-icon.borrow {
+    background: linear-gradient(45deg, #fce7f3, #fbcfe8);
+    color: #be185d;
+}
+
+.activity-content {
+    flex: 1;
+}
+
+.activity-title {
+    font-weight: 600;
+    color: var(--library-text);
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.activity-meta {
+    color: var(--library-muted);
+    font-size: 0.8rem;
+    margin: 0;
+}
+
+.chart-container {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    border: 1px solid rgba(30, 58, 138, 0.1);
+    margin-bottom: 2rem;
+}
+
+.breadcrumb {
+    background: transparent;
+}
+
+.breadcrumb-item a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+}
+
+.breadcrumb-item.active {
+    color: white;
+}
+
+.pulse-icon {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease;
+    animation: fadeInUp 0.8s ease forwards;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.badge-custom {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 0.85rem;
+}
+
+.badge-pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.badge-approved {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.badge-danger {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* Clickable sections styling */
+.clickable-section {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.clickable-section:hover {
+    background: rgba(30, 58, 138, 0.02);
+    transform: translateX(5px);
+}
+
+.section-header {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.section-header:hover {
+    background: rgba(30, 58, 138, 0.05);
+}
+
+.collapse-icon {
+    transition: transform 0.3s ease;
+    font-size: 0.9rem;
+    color: var(--library-primary);
+}
+
+.collapsed .collapse-icon {
+    transform: rotate(-90deg);
+}
+
+.dropdown-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    background: rgba(30, 58, 138, 0.02);
+    border-radius: 8px;
+    margin-top: 0.5rem;
+}
+
+.dropdown-content.show {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.user-detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid rgba(30, 58, 138, 0.1);
+    transition: background 0.3s ease;
+}
+
+.user-detail-item:hover {
+    background: rgba(30, 58, 138, 0.05);
+}
+
+.user-detail-item:last-child {
+    border-bottom: none;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.user-name {
+    font-weight: 600;
+    color: var(--library-text);
+    font-size: 0.9rem;
+}
+
+.user-meta {
+    color: var(--library-muted);
+    font-size: 0.8rem;
+}
+
+.user-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.badge-student {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.badge-staff {
+    background: #dcfce7;
+    color: #059669;
+}
+
+.badge-admin {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+@media (max-width: 768px) {
+    .stats-hero {
+        padding: 2rem 0;
+    }
+    
+    .stats-number {
+        font-size: 2rem;
+    }
+    
+    .detailed-stats-card {
+        padding: 1rem;
+    }
+}
+</style>
+
+<div class="stats-hero">
+    <div class="container">
+        <div class="hero-content">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <nav aria-label="breadcrumb" class="mb-3">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{% url 'library:home' %}">Home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Statistics Dashboard</li>
+                        </ol>
+                    </nav>
+                    <h1 class="display-5 fw-bold mb-3">
+                        <i class="fas fa-chart-bar me-3 pulse-icon"></i>Statistics Dashboard
+                    </h1>
+                    <p class="lead mb-4" style="opacity: 0.9;">Comprehensive analytics and insights for library usage and management</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <!-- Overview Statistics -->
+    <div class="row">
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="stats-card text-center fade-in">
+                <div class="stats-icon books">
+                    <i class="fas fa-book"></i>
+                </div>
+                <div class="stats-number" style="color: var(--library-primary);">{{ total_books }}</div>
+                <p class="stats-label">Total Books</p>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="stats-card text-center fade-in">
+                <div class="stats-icon users">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stats-number" style="color: #059669;">{{ total_users }}</div>
+                <p class="stats-label">Total Users</p>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="stats-card text-center fade-in">
+                <div class="stats-icon downloads">
+                    <i class="fas fa-download"></i>
+                </div>
+                <div class="stats-number" style="color: #d97706;">{{ total_downloads }}</div>
+                <p class="stats-label">Total Downloads</p>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="stats-card text-center fade-in">
+                <div class="stats-icon borrows">
+                    <i class="fas fa-book-reader"></i>
+                </div>
+                <div class="stats-number" style="color: #be185d;">{{ total_borrows }}</div>
+                <p class="stats-label">Total Borrows</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Statistics -->
+    <div class="row">
+        <!-- User Analytics -->
+        <div class="col-lg-4 mb-4">
+            <div class="detailed-stats-card">
+                <h3 class="section-title">
+                    <i class="fas fa-user-friends"></i>
+                    User Analytics
+                </h3>
+                
+                <!-- Students Section -->
+                <div class="clickable-section" data-target="students-dropdown">
+                    <div class="metric-item section-header">
+                        <span class="metric-label">
+                            <i class="fas fa-graduation-cap me-2"></i>Students
+                        </span>
+                        <div class="d-flex align-items-center">
+                            <span class="metric-value me-2">{{ total_students }}</span>
+                            <i class="fas fa-chevron-down collapse-icon"></i>
+                        </div>
+                    </div>
+                    <div class="dropdown-content" id="students-dropdown">
+                        {% for student in all_students %}
+                        <div class="user-detail-item">
+                            <div class="user-info">
+                                <div class="user-name">{{ student.get_full_name }}</div>
+                                <div class="user-meta">
+                                    <i class="fas fa-envelope me-1"></i>{{ student.email }}
+                                    {% if student.academic_level %}
+                                    • {{ student.academic_level }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <span class="user-badge badge-student">Student</span>
+                        </div>
+                        {% empty %}
+                        <div class="user-detail-item">
+                            <span class="text-muted">No students found</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Staff/Teachers Section -->
+                <div class="clickable-section" data-target="staff-dropdown">
+                    <div class="metric-item section-header">
+                        <span class="metric-label">
+                            <i class="fas fa-chalkboard-teacher me-2"></i>Staff/Teachers
+                        </span>
+                        <div class="d-flex align-items-center">
+                            <span class="metric-value me-2">{{ total_staff }}</span>
+                            <i class="fas fa-chevron-down collapse-icon"></i>
+                        </div>
+                    </div>
+                    <div class="dropdown-content" id="staff-dropdown">
+                        {% for staff in all_staff %}
+                        <div class="user-detail-item">
+                            <div class="user-info">
+                                <div class="user-name">{{ staff.get_full_name }}</div>
+                                <div class="user-meta">
+                                    <i class="fas fa-envelope me-1"></i>{{ staff.email }}
+                                    {% if staff.phone_number %}
+                                    • <i class="fas fa-phone me-1"></i>{{ staff.phone_number }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <span class="user-badge badge-staff">Staff</span>
+                        </div>
+                        {% empty %}
+                        <div class="user-detail-item">
+                            <span class="text-muted">No staff members found</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Administrators Section -->
+                <div class="clickable-section" data-target="admin-dropdown">
+                    <div class="metric-item section-header">
+                        <span class="metric-label">
+                            <i class="fas fa-user-shield me-2"></i>Administrators
+                        </span>
+                        <div class="d-flex align-items-center">
+                            <span class="metric-value me-2">{{ total_admin }}</span>
+                            <i class="fas fa-chevron-down collapse-icon"></i>
+                        </div>
+                    </div>
+                    <div class="dropdown-content" id="admin-dropdown">
+                        {% for admin in all_admins %}
+                        <div class="user-detail-item">
+                            <div class="user-info">
+                                <div class="user-name">{{ admin.get_full_name }}</div>
+                                <div class="user-meta">
+                                    <i class="fas fa-envelope me-1"></i>{{ admin.email }}
+                                    {% if admin.date_joined %}
+                                    • Joined {{ admin.date_joined|date:"M d, Y" }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <span class="user-badge badge-admin">Admin</span>
+                        </div>
+                        {% empty %}
+                        <div class="user-detail-item">
+                            <span class="text-muted">No administrators found</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="metric-item">
+                    <span class="metric-label">Active Borrows</span>
+                    <span class="metric-value">{{ active_borrows }}</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Pending Requests</span>
+                    <span class="metric-value">
+                        {% if pending_borrows > 0 %}
+                            <span class="badge badge-pending">{{ pending_borrows }}</span>
+                        {% else %}
+                            <span class="badge badge-approved">{{ pending_borrows }}</span>
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Library Analytics -->
+        <div class="col-lg-4 mb-4">
+            <div class="detailed-stats-card">
+                <h3 class="section-title">
+                    <i class="fas fa-chart-pie"></i>
+                    Books by Category
+                </h3>
+                {% for category in books_by_category %}
+                <div class="clickable-section" data-target="category-{{ forloop.counter }}-dropdown">
+                    <div class="metric-item section-header">
+                        <span class="metric-label">
+                            <i class="fas fa-folder me-2"></i>{{ category.category__name|default:"Uncategorized" }}
+                        </span>
+                        <div class="d-flex align-items-center">
+                            <span class="metric-value me-2">{{ category.count }}</span>
+                            <i class="fas fa-chevron-down collapse-icon"></i>
+                        </div>
+                    </div>
+                    <div class="dropdown-content" id="category-{{ forloop.counter }}-dropdown">
+                        {% for book in category.books %}
+                        <div class="user-detail-item">
+                            <div class="user-info">
+                                <div class="user-name">{{ book.title|truncatechars:30 }}</div>
+                                <div class="user-meta">
+                                    <i class="fas fa-user me-1"></i>{{ book.author|truncatechars:25 }}
+                                    • <i class="fas fa-calendar me-1"></i>{{ book.publication_date|date:"Y" }}
+                                </div>
+                            </div>
+                            <span class="user-badge badge-student">
+                                {% if book.is_available %}Available{% else %}Borrowed{% endif %}
+                            </span>
+                        </div>
+                        {% empty %}
+                        <div class="user-detail-item">
+                            <span class="text-muted">No books in this category</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted">No categories found</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Download Analytics -->
+        <div class="col-lg-4 mb-4">
+            <div class="detailed-stats-card">
+                <h3 class="section-title">
+                    <i class="fas fa-download"></i>
+                    Download Analytics
+                </h3>
+                <div class="metric-item">
+                    <span class="metric-label">Downloads (Last 30 days)</span>
+                    <span class="metric-value">{{ recent_downloads }}</span>
+                </div>
+                
+                <!-- Most Downloaded Books -->
+                <div class="clickable-section" data-target="downloads-dropdown">
+                    <div class="metric-item section-header">
+                        <span class="metric-label">
+                            <i class="fas fa-star me-2"></i>Most Downloaded Books
+                        </span>
+                        <div class="d-flex align-items-center">
+                            <span class="metric-value me-2">{{ most_downloaded_books|length }}</span>
+                            <i class="fas fa-chevron-down collapse-icon"></i>
+                        </div>
+                    </div>
+                    <div class="dropdown-content" id="downloads-dropdown">
+                        {% for book in most_downloaded_books %}
+                        <div class="user-detail-item">
+                            <div class="user-info">
+                                <div class="user-name">{{ book.title|truncatechars:30 }}</div>
+                                <div class="user-meta">
+                                    <i class="fas fa-user me-1"></i>{{ book.author|truncatechars:25 }}
+                                    • <i class="fas fa-download me-1"></i>{{ book.download_count }} downloads
+                                </div>
+                            </div>
+                            <span class="user-badge badge-admin">Popular</span>
+                        </div>
+                        {% empty %}
+                        <div class="user-detail-item">
+                            <span class="text-muted">No downloads recorded yet</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="detailed-stats-card">
+                <div class="clickable-section" data-target="recent-downloads-dropdown">
+                    <div class="section-header" style="padding: 1rem;">
+                        <h3 class="section-title mb-0">
+                            <i class="fas fa-clock"></i>
+                            Recent Downloads
+                        </h3>
+                        <div class="d-flex align-items-center">
+                            <span class="metric-value me-2">{{ recent_downloads_list|length }}</span>
+                            <i class="fas fa-chevron-down collapse-icon"></i>
+                        </div>
+                    </div>
+                    <div class="dropdown-content show" id="recent-downloads-dropdown">
+                        <div class="recent-activity">
+                            {% for download in recent_downloads_list %}
+                            <div class="activity-item">
+                                <div class="activity-icon download">
+                                    <i class="fas fa-download"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <p class="activity-title">{{ download.book_file.book.title }}</p>
+                                    <p class="activity-meta">
+                                        by {{ download.user.get_full_name }} • 
+                                        {{ download.downloaded_at|timesince }} ago
+                                        {% if download.ip_address %}
+                                        • IP: {{ download.ip_address }}
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <p class="text-muted p-3">No recent downloads</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 mb-4">
+            <div class="detailed-stats-card">
+                <div class="clickable-section" data-target="recent-borrows-dropdown">
+                    <div class="section-header" style="padding: 1rem;">
+                        <h3 class="section-title mb-0">
+                            <i class="fas fa-book-reader"></i>
+                            Recent Borrow Requests
+                        </h3>
+                        <div class="d-flex align-items-center">
+                            <span class="metric-value me-2">{{ recent_borrows|length }}</span>
+                            <i class="fas fa-chevron-down collapse-icon"></i>
+                        </div>
+                    </div>
+                    <div class="dropdown-content show" id="recent-borrows-dropdown">
+                        <div class="recent-activity">
+                            {% for borrow in recent_borrows %}
+                            <div class="activity-item">
+                                <div class="activity-icon borrow">
+                                    <i class="fas fa-book-reader"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <p class="activity-title">{{ borrow.book.title }}</p>
+                                    <p class="activity-meta">
+                                        by {{ borrow.borrower.get_full_name }} • 
+                                        <span class="badge badge-custom 
+                                            {% if borrow.status == 'pending' %}badge-pending
+                                            {% elif borrow.status == 'approved' %}badge-approved
+                                            {% else %}badge-danger{% endif %}">
+                                            {{ borrow.get_status_display }}
+                                        </span> • 
+                                        {{ borrow.borrowed_date|timesince }} ago
+                                    </p>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <p class="text-muted p-3">No recent borrow requests</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate numbers counting up
+    function animateValue(element, start, end, duration) {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            const current = Math.floor(progress * (end - start) + start);
+            element.textContent = current;
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    // Animate all stat numbers
+    const statNumbers = document.querySelectorAll('.stats-number');
+    statNumbers.forEach(element => {
+        const finalValue = parseInt(element.textContent);
+        element.textContent = '0';
+        
+        // Start animation after a short delay
+        setTimeout(() => {
+            animateValue(element, 0, finalValue, 2000);
+        }, 500);
+    });
+
+    // Handle clickable sections
+    const clickableSections = document.querySelectorAll('.clickable-section');
+    
+    clickableSections.forEach(section => {
+        const header = section.querySelector('.section-header');
+        const targetId = section.getAttribute('data-target');
+        const dropdown = document.getElementById(targetId);
+        const icon = section.querySelector('.collapse-icon');
+        
+        if (header && dropdown && icon) {
+            header.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Toggle the dropdown
+                const isCollapsed = section.classList.contains('collapsed');
+                
+                if (isCollapsed) {
+                    // Expand
+                    section.classList.remove('collapsed');
+                    dropdown.classList.add('show');
+                    icon.style.transform = 'rotate(0deg)';
+                } else {
+                    // Collapse
+                    section.classList.add('collapsed');
+                    dropdown.classList.remove('show');
+                    icon.style.transform = 'rotate(-90deg)';
+                }
+            });
+            
+            // Initialize state - check if dropdown already has 'show' class
+            if (dropdown.classList.contains('show')) {
+                // Keep expanded (for recent activity sections)
+                section.classList.remove('collapsed');
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                // Initialize as collapsed (for user analytics and category sections)
+                section.classList.add('collapsed');
+                dropdown.classList.remove('show');
+                icon.style.transform = 'rotate(-90deg)';
+            }
+        }
+    });
+
+    // Add hover effects for user detail items
+    const userDetailItems = document.querySelectorAll('.user-detail-item');
+    userDetailItems.forEach(item => {
+        item.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateX(5px)';
+        });
+        
+        item.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateX(0)';
+        });
+    });
+
+    // Auto-refresh data every 30 seconds
+    setInterval(() => {
+        // You could add AJAX refresh here if needed
+        console.log('Data refresh interval');
+    }, 30000);
+});
+</script>
+{% endblock %}

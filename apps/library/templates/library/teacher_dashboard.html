@@ -1,0 +1,880 @@
+{% extends 'library/base.html' %}
+
+{% block title %}Staff Dashboard - AcademiaLink Library{% endblock %}
+
+{% block content %}
+<style>
+/* Staff Dashboard Theme Variables */
+:root {
+    --library-primary: #1e3a8a;
+    --library-secondary: #3b82f6;
+    --library-accent: #0ea5e9;
+    --library-success: #059669;
+    --library-warning: #d97706;
+    --library-danger: #dc2626;
+    --library-light: #cbd5e1;
+    --library-dark: #334155;
+    --library-text: #1e293b;
+    --library-muted: #64748b;
+    --library-bg: #f8fafc;
+    --library-gradient: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    --library-gradient-light: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+}
+
+.dashboard-hero {
+    background: var(--library-gradient);
+    color: white;
+    padding: 3rem 0;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.dashboard-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+    opacity: 0.3;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+.welcome-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 10px 30px rgba(30, 58, 138, 0.15);
+}
+
+.enhanced-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(30, 58, 138, 0.1);
+    border: none;
+    margin-bottom: 2rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.enhanced-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(30, 58, 138, 0.15);
+}
+
+.enhanced-card .card-header {
+    background: var(--library-gradient-light);
+    border-bottom: none;
+    padding: 1.5rem 2rem;
+    border-radius: 20px 20px 0 0;
+}
+
+.enhanced-card .card-title {
+    color: var(--library-primary);
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.enhanced-card .card-body {
+    padding: 2rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(30, 58, 138, 0.1);
+    border: none;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--library-gradient);
+}
+
+.stat-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(30, 58, 138, 0.2);
+}
+
+.stat-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 1.8rem;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-icon.primary {
+    background: var(--library-gradient);
+}
+
+.stat-icon.success {
+    background: linear-gradient(135deg, #059669, #10b981);
+}
+
+.stat-icon.warning {
+    background: linear-gradient(135deg, #d97706, #f59e0b);
+}
+
+.stat-icon.info {
+    background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--library-primary);
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: var(--library-muted);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.enhanced-table {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(30, 58, 138, 0.1);
+}
+
+.enhanced-table thead {
+    background: var(--library-gradient-light);
+}
+
+.enhanced-table thead th {
+    border: none;
+    color: var(--library-primary);
+    font-weight: 600;
+    padding: 1.5rem 1rem;
+    text-align: center;
+}
+
+.enhanced-table tbody tr {
+    transition: all 0.3s ease;
+    border-bottom: 1px solid rgba(30, 58, 138, 0.1);
+}
+
+.enhanced-table tbody tr:hover {
+    background: var(--library-gradient-light);
+    transform: scale(1.01);
+}
+
+.enhanced-table tbody td {
+    padding: 1rem;
+    border: none;
+    vertical-align: middle;
+    text-align: center;
+}
+
+.btn-teacher-primary {
+    background: var(--library-gradient);
+    border: none;
+    color: white;
+    font-weight: 500;
+    padding: 10px 20px;
+    border-radius: 18px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-teacher-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(30, 58, 138, 0.3);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-teacher-approve {
+    background: linear-gradient(135deg, #059669, #10b981);
+    border: none;
+    color: white;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 15px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    font-size: 0.875rem;
+}
+
+.btn-teacher-approve:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(5, 150, 105, 0.3);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-teacher-reject {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    border: none;
+    color: white;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 15px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    font-size: 0.875rem;
+}
+
+.btn-teacher-reject:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(220, 38, 38, 0.3);
+    color: white;
+    text-decoration: none;
+}
+
+.book-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(30, 58, 138, 0.1);
+    border: none;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    height: 100%;
+}
+
+.book-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(30, 58, 138, 0.2);
+}
+
+.book-card-header {
+    background: var(--library-gradient-light);
+    padding: 1rem;
+    text-align: center;
+    position: relative;
+}
+
+.book-icon {
+    width: 50px;
+    height: 50px;
+    background: var(--library-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+    margin: 0 auto;
+}
+
+.category-badge {
+    background: var(--library-gradient);
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.book-card-body {
+    padding: 1.5rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.book-title {
+    color: var(--library-primary);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.book-author {
+    color: var(--library-muted);
+    font-weight: 500;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.book-description {
+    color: var(--library-text);
+    font-size: 0.85rem;
+    line-height: 1.4;
+    margin-bottom: 1rem;
+    flex-grow: 1;
+}
+
+.book-card-actions {
+    padding: 1rem 1.5rem;
+    background: #f8fafc;
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+}
+
+.btn-book-preview {
+    background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 15px;
+    font-weight: 500;
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-book-preview:hover {
+    background: linear-gradient(135deg, #0284c7, #0ea5e9);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(14, 165, 233, 0.3);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-book-details {
+    background: linear-gradient(135deg, #64748b, #94a3b8);
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 15px;
+    font-weight: 500;
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-book-details:hover {
+    background: linear-gradient(135deg, #475569, #64748b);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(100, 116, 139, 0.3);
+    color: white;
+    text-decoration: none;
+}
+
+.pulse-icon {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease;
+    animation: fadeInUp 0.8s ease forwards;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.badge-status {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 0.85rem;
+}
+
+.badge-pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.badge-approved {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.badge-rejected {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+@media (max-width: 768px) {
+    .dashboard-hero {
+        padding: 2rem 0;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+    
+    .stat-card {
+        padding: 1.5rem;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+    }
+    
+    .enhanced-table thead th,
+    .enhanced-table tbody td {
+        padding: 0.75rem 0.5rem;
+    }
+    
+    .book-card-actions {
+        flex-direction: column;
+    }
+}
+</style>
+
+<!-- Hero Section -->
+<section class="dashboard-hero">
+    <div class="container">
+        <div class="hero-content fade-in">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <nav aria-label="breadcrumb" class="mb-3">
+                        <ol class="breadcrumb" style="background: transparent;">
+                            <li class="breadcrumb-item"><a href="{% url 'library:home' %}" class="text-white" style="opacity: 0.9;">Home</a></li>
+                            <li class="breadcrumb-item active text-white" aria-current="page">
+                                {% if user.is_superuser %}Admin Dashboard{% else %}Staff Dashboard{% endif %}
+                            </li>
+                        </ol>
+                    </nav>
+                    <h1 class="display-5 fw-bold mb-3">
+                        {% if user.is_superuser %}
+                            <i class="fas fa-user-shield me-3 pulse-icon"></i>Admin Dashboard
+                        {% else %}
+                            <i class="fas fa-chalkboard-teacher me-3 pulse-icon"></i>Staff Dashboard
+                        {% endif %}
+                    </h1>
+                    <p class="lead mb-4" style="opacity: 0.9;">Welcome back, {{ user.get_full_name }}! Manage library resources and student requests efficiently.</p>
+                </div>
+                <div class="col-lg-4">
+                    <div class="welcome-card">
+                        <h5 class="mb-3" style="color: var(--library-primary);">
+                            <i class="fas fa-chart-line me-2"></i>Quick Overview
+                        </h5>
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <h3 class="mb-1" style="color: var(--library-primary);">{{ pending_borrows.count }}</h3>
+                                <small style="color: var(--library-muted);">Pending Requests</small>
+                            </div>
+                            <div class="col-6">
+                                <h3 class="mb-1" style="color: var(--library-primary);">{{ total_books }}</h3>
+                                <small style="color: var(--library-muted);">Total Books</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    <!-- Enhanced Statistics Cards -->
+    <div class="stats-grid fade-in">
+        <div class="stat-card">
+            <div class="stat-icon primary">
+                <i class="fas fa-book"></i>
+            </div>
+            <div class="stat-number">{{ total_books }}</div>
+            <div class="stat-label">Total Books</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon warning">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-number">{{ pending_borrows.count }}</div>
+            <div class="stat-label">Pending Requests</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon success">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-number">{{ total_borrows }}</div>
+            <div class="stat-label">Total Borrows</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon info">
+                <i class="fas fa-book-reader"></i>
+            </div>
+            <div class="stat-number">{{ recent_books.count }}</div>
+            <div class="stat-label">Recent Books</div>
+        </div>
+    </div>
+
+    <!-- Pending Borrow Requests -->
+    {% if pending_borrows %}
+    <div class="enhanced-card fade-in">
+        <div class="card-header">
+            <h4 class="card-title">
+                <i class="fas fa-clock"></i>
+                Pending Borrow Requests
+                <span class="badge badge-pending ms-2">{{ pending_borrows.count }}</span>
+            </h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table enhanced-table">
+                    <thead>
+                        <tr>
+                            <th>Book</th>
+                            <th>Student</th>
+                            <th>Request Date</th>
+                            <th>Due Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for borrow in pending_borrows %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="book-icon me-3">
+                                        <i class="fas fa-book"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold">{{ borrow.book.title|truncatechars:30 }}</div>
+                                        <small class="text-muted">{{ borrow.book.author|truncatechars:20 }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div>
+                                    <div class="fw-bold">{{ borrow.borrower.get_full_name }}</div>
+                                    <small class="text-muted">{{ borrow.borrower.email }}</small>
+                                </div>
+                            </td>
+                            <td>{{ borrow.borrowed_date|date:"M d, Y" }}</td>
+                            <td>{{ borrow.due_date|date:"M d, Y" }}</td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'library:approve_borrow' borrow.id %}" 
+                                       class="btn-teacher-approve"
+                                       onclick="return confirm('Approve this borrow request?')">
+                                        <i class="fas fa-check"></i>
+                                        Approve
+                                    </a>
+                                    <a href="{% url 'library:reject_borrow' borrow.id %}" 
+                                       class="btn-teacher-reject"
+                                       onclick="return confirm('Reject this borrow request?')">
+                                        <i class="fas fa-times"></i>
+                                        Reject
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- All Borrow Requests -->
+    <div class="enhanced-card fade-in">
+        <div class="card-header">
+            <h4 class="card-title">
+                <i class="fas fa-list"></i>
+                Recent Borrow Requests
+            </h4>
+        </div>
+        <div class="card-body">
+            {% if all_borrows %}
+            <div class="table-responsive">
+                <table class="table enhanced-table">
+                    <thead>
+                        <tr>
+                            <th>Book</th>
+                            <th>Student</th>
+                            <th>Request Date</th>
+                            <th>Status</th>
+                            <th>Due Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for borrow in all_borrows %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="book-icon me-3">
+                                        <i class="fas fa-book"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold">{{ borrow.book.title|truncatechars:30 }}</div>
+                                        <small class="text-muted">{{ borrow.book.author|truncatechars:20 }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div>
+                                    <div class="fw-bold">{{ borrow.borrower.get_full_name }}</div>
+                                    <small class="text-muted">{{ borrow.borrower.email }}</small>
+                                </div>
+                            </td>
+                            <td>{{ borrow.borrowed_date|date:"M d, Y" }}</td>
+                            <td>
+                                <span class="badge-status 
+                                    {% if borrow.status == 'pending' %}badge-pending
+                                    {% elif borrow.status == 'approved' %}badge-approved
+                                    {% else %}badge-rejected{% endif %}">
+                                    {{ borrow.get_status_display }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if borrow.due_date %}
+                                    {{ borrow.due_date|date:"M d, Y" }}
+                                {% else %}
+                                    <span class="text-muted">Not set</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+                <i class="fas fa-book-open text-muted" style="font-size: 3rem;"></i>
+                <h5 class="mt-3 text-muted">No borrow requests yet</h5>
+                <p class="text-muted">Borrow requests will appear here once students start requesting books.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Recent Books -->
+    <div class="enhanced-card fade-in">
+        <div class="card-header">
+            <h4 class="card-title">
+                <i class="fas fa-book-open"></i>
+                Recent Books
+            </h4>
+        </div>
+        <div class="card-body">
+            {% if recent_books %}
+            <div class="row">
+                {% for book in recent_books %}
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="book-card">
+                        <div class="book-card-header">
+                            {% if book.category %}
+                            <span class="category-badge">{{ book.category.name }}</span>
+                            {% endif %}
+                            <div class="book-icon">
+                                <i class="fas fa-book"></i>
+                            </div>
+                        </div>
+                        <div class="book-card-body">
+                            <h5 class="book-title">{{ book.title|truncatechars:40 }}</h5>
+                            <p class="book-author">by {{ book.author|truncatechars:30 }}</p>
+                            <p class="book-description">{{ book.description|truncatechars:100 }}</p>
+                        </div>
+                        <div class="book-card-actions">
+                            {% if book.files.first %}
+                            <a href="{% url 'library:preview_book' book.files.first.id %}" 
+                               class="btn-book-preview" target="_blank">
+                                <i class="fas fa-eye"></i>
+                                Preview
+                            </a>
+                            {% endif %}
+                            <a href="{% url 'library:book_detail' book.id %}" 
+                               class="btn-book-details">
+                                <i class="fas fa-info-circle"></i>
+                                Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+                <i class="fas fa-book text-muted" style="font-size: 3rem;"></i>
+                <h5 class="mt-3 text-muted">No books available</h5>
+                <p class="text-muted">Books will appear here once they are added to the library.</p>
+                {% if user.is_superuser %}
+                <a href="{% url 'library:upload_book' %}" class="btn-teacher-primary mt-3">
+                    <i class="fas fa-plus"></i>
+                    Add First Book
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Quick Actions for Admin -->
+    {% if user.is_superuser %}
+    <div class="enhanced-card fade-in">
+        <div class="card-header">
+            <h4 class="card-title">
+                <i class="fas fa-tools"></i>
+                Quick Actions
+            </h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <a href="{% url 'library:upload_book' %}" class="btn-teacher-primary w-100">
+                        <i class="fas fa-plus"></i>
+                        Add New Book
+                    </a>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <a href="{% url 'library:statistics' %}" class="btn-teacher-primary w-100">
+                        <i class="fas fa-chart-bar"></i>
+                        View Statistics
+                    </a>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <a href="{% url 'library:book_list' %}" class="btn-teacher-primary w-100">
+                        <i class="fas fa-book"></i>
+                        Manage Books
+                    </a>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <a href="/admin/" class="btn-teacher-primary w-100" target="_blank">
+                        <i class="fas fa-cog"></i>
+                        Admin Panel
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate numbers counting up
+    function animateValue(element, start, end, duration) {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            const current = Math.floor(progress * (end - start) + start);
+            element.textContent = current;
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    // Animate all stat numbers
+    const statNumbers = document.querySelectorAll('.stat-number');
+    statNumbers.forEach(element => {
+        const finalValue = parseInt(element.textContent);
+        element.textContent = '0';
+        
+        // Start animation after a short delay
+        setTimeout(() => {
+            animateValue(element, 0, finalValue, 2000);
+        }, 500);
+    });
+
+    // Add hover effects for cards
+    const cards = document.querySelectorAll('.enhanced-card, .stat-card, .book-card');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+
+    // Add click effects for buttons
+    const buttons = document.querySelectorAll('.btn-teacher-primary, .btn-teacher-approve, .btn-teacher-reject, .btn-book-preview, .btn-book-details');
+    buttons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            // Create ripple effect
+            const ripple = document.createElement('span');
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+            
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            ripple.classList.add('ripple');
+            
+            this.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+});
+</script>
+
+<style>
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(0);
+    animation: ripple-animation 0.6s linear;
+    pointer-events: none;
+}
+
+@keyframes ripple-animation {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+</style>
+{% endblock %}

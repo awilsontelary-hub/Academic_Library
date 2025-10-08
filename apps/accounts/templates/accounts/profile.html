@@ -1,0 +1,701 @@
+{% extends 'library/base.html' %}
+
+{% block title %}Profile - Online Library{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --library-primary: #1e3a8a;
+        --library-secondary: #3b82f6;
+        --library-accent: #60a5fa;
+        --library-light: #dbeafe;
+        --library-dark: #1e40af;
+        --library-success: #059669;
+        --library-warning: #d97706;
+        --library-danger: #dc2626;
+    }
+
+    .profile-hero {
+        background: linear-gradient(135deg, var(--library-primary) 0%, var(--library-secondary) 100%);
+        padding: 4rem 0 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .profile-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="library-pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="20" height="20" fill="none"/><circle cx="10" cy="10" r="2" fill="rgba(255,255,255,0.1)"/><rect x="6" y="2" width="8" height="1" fill="rgba(255,255,255,0.05)"/><rect x="4" y="16" width="12" height="1" fill="rgba(255,255,255,0.05)"/></pattern></defs><rect width="100" height="100" fill="url(%23library-pattern)"/></svg>') repeat;
+        opacity: 0.3;
+    }
+
+    .profile-header {
+        text-align: center;
+        color: white;
+        position: relative;
+        z-index: 2;
+        margin-bottom: 2rem;
+    }
+
+    .profile-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .profile-subtitle {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        margin-bottom: 2rem;
+    }
+
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--library-accent), #a855f7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        border: 4px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        animation: pulse 3s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+        50% { box-shadow: 0 8px 32px rgba(59, 130, 246, 0.3); }
+    }
+
+    .profile-avatar i {
+        font-size: 3rem;
+        color: white;
+    }
+
+    .profile-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        margin-top: -3rem;
+        position: relative;
+        z-index: 3;
+        animation: slideInUp 0.8s ease-out;
+    }
+
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .profile-card-header {
+        background: linear-gradient(135deg, rgba(30, 58, 138, 0.1), rgba(59, 130, 246, 0.1));
+        padding: 2rem;
+        text-align: center;
+        border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .profile-card-title {
+        color: var(--library-primary);
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+    }
+
+    .profile-form {
+        padding: 2.5rem;
+    }
+
+    .form-section {
+        margin-bottom: 2rem;
+    }
+
+    .section-title {
+        color: var(--library-primary);
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--library-light);
+    }
+
+    .form-group {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: var(--library-primary);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-control {
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 12px 16px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #f9fafb;
+    }
+
+    .form-control:focus {
+        border-color: var(--library-secondary);
+        box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+        background: white;
+        transform: translateY(-2px);
+    }
+
+    .account-type-display {
+        background: linear-gradient(135deg, var(--library-light), #f0f9ff);
+        border-radius: 15px;
+        padding: 1.5rem;
+        border: 2px solid var(--library-accent);
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .account-type-display::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        animation: shimmer 3s infinite;
+    }
+
+    @keyframes shimmer {
+        0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+        100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    }
+
+    .badge-staff {
+        background: linear-gradient(135deg, var(--library-primary), var(--library-secondary));
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 25px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .badge-student {
+        background: linear-gradient(135deg, var(--library-success), #10b981);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 25px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 1rem;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-top: 2rem;
+    }
+
+    .btn-back {
+        background: linear-gradient(135deg, #6b7280, #4b5563);
+        border: none;
+        border-radius: 12px;
+        padding: 12px 24px;
+        color: white;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-back:hover {
+        background: linear-gradient(135deg, #4b5563, #374151);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(75, 85, 99, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-update {
+        background: linear-gradient(135deg, var(--library-primary), var(--library-secondary));
+        border: none;
+        border-radius: 12px;
+        padding: 12px 24px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: white;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-update:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        background: linear-gradient(135deg, var(--library-dark), var(--library-primary));
+    }
+
+    .btn-update::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .btn-update:hover::before {
+        left: 100%;
+    }
+
+    .error-message {
+        background: linear-gradient(135deg, #fef2f2, #fee2e2);
+        color: var(--library-danger);
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        border-left: 4px solid var(--library-danger);
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+        animation: shake 0.5s ease-in-out;
+    }
+
+    @keyframes shake {
+        0%, 20%, 40%, 60%, 80%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    }
+
+    .floating-elements {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        pointer-events: none;
+    }
+
+    .floating-icon {
+        position: absolute;
+        color: rgba(255, 255, 255, 0.1);
+        animation: float 6s ease-in-out infinite;
+    }
+
+    .floating-icon:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+    .floating-icon:nth-child(2) { top: 40%; right: 15%; animation-delay: 2s; }
+    .floating-icon:nth-child(3) { bottom: 30%; left: 20%; animation-delay: 4s; }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(5deg); }
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+        border-radius: 15px;
+        padding: 1.5rem;
+        text-align: center;
+        border: 2px solid rgba(59, 130, 246, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(59, 130, 246, 0.15);
+        border-color: var(--library-accent);
+    }
+
+    .stat-icon {
+        font-size: 2rem;
+        color: var(--library-secondary);
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--library-primary);
+        margin: 0;
+    }
+
+    .stat-label {
+        color: #6b7280;
+        font-size: 0.9rem;
+        margin: 0;
+    }
+
+    @media (max-width: 768px) {
+        .profile-hero {
+            padding: 2rem 0 1rem;
+        }
+        
+        .profile-title {
+            font-size: 2rem;
+        }
+        
+        .profile-form {
+            padding: 1.5rem;
+        }
+        
+        .button-group {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .btn-back,
+        .btn-update {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-hero">
+    <div class="floating-elements">
+        <i class="fas fa-user-graduate floating-icon fa-3x"></i>
+        <i class="fas fa-id-card floating-icon fa-2x"></i>
+        <i class="fas fa-cog floating-icon fa-3x"></i>
+    </div>
+    
+    <div class="container">
+        <div class="profile-header">
+            <div class="profile-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <h1 class="profile-title">{{ user.get_full_name|default:user.username }}</h1>
+            <p class="profile-subtitle">Manage your library profile and settings</p>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="profile-card">
+                <div class="profile-card-header">
+                    <h2 class="profile-card-title">
+                        <i class="fas fa-edit"></i>
+                        Profile Information
+                    </h2>
+                </div>
+                
+                <div class="profile-form">
+                    <!-- User Stats -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <div class="stat-value">{{ user.date_joined|date:"M Y" }}</div>
+                            <div class="stat-label">Member Since</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-sign-in-alt"></i>
+                            </div>
+                            <div class="stat-value">{{ user.last_login|date:"M d" }}</div>
+                            <div class="stat-label">Last Login</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                {% if user.staff or user.is_superuser %}
+                                    <i class="fas fa-chalkboard-teacher"></i>
+                                {% else %}
+                                    <i class="fas fa-graduation-cap"></i>
+                                {% endif %}
+                            </div>
+                            <div class="stat-value">
+                                {% if user.is_superuser %}Admin{% elif user.staff %}Staff{% else %}Student{% endif %}
+                            </div>
+                            <div class="stat-label">Account Type</div>
+                        </div>
+                    </div>
+
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Personal Information Section -->
+                        <div class="form-section">
+                            <h3 class="section-title">
+                                <i class="fas fa-user"></i>
+                                Personal Information
+                            </h3>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.first_name.id_for_label }}" class="form-label">
+                                            <i class="fas fa-user"></i>
+                                            First Name
+                                        </label>
+                                        {{ form.first_name }}
+                                        {% if form.first_name.errors %}
+                                            <div class="error-message">
+                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                {{ form.first_name.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.last_name.id_for_label }}" class="form-label">
+                                            <i class="fas fa-user"></i>
+                                            Last Name
+                                        </label>
+                                        {{ form.last_name }}
+                                        {% if form.last_name.errors %}
+                                            <div class="error-message">
+                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                {{ form.last_name.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contact Information Section -->
+                        <div class="form-section">
+                            <h3 class="section-title">
+                                <i class="fas fa-envelope"></i>
+                                Contact Information
+                            </h3>
+                            
+                            <div class="form-group">
+                                <label for="{{ form.email.id_for_label }}" class="form-label">
+                                    <i class="fas fa-envelope"></i>
+                                    Email Address
+                                </label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                    <div class="error-message">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        {{ form.email.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Account Information Section -->
+                        <div class="form-section">
+                            <h3 class="section-title">
+                                <i class="fas fa-id-badge"></i>
+                                Account Information
+                            </h3>
+                            
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-user-tag"></i>
+                                    Account Type
+                                </label>
+                                <div class="account-type-display">
+                                    {% if user.is_superuser %}
+                                        <span class="badge-staff">
+                                            <i class="fas fa-user-shield"></i>
+                                            Administrator
+                                        </span>
+                                        <div class="mt-2 text-muted">
+                                            <small>Full administrative access to all library functions</small>
+                                        </div>
+                                    {% elif user.staff %}
+                                        <span class="badge-staff">
+                                            <i class="fas fa-chalkboard-teacher"></i>
+                                            Staff/Teacher
+                                        </span>
+                                        <div class="mt-2 text-muted">
+                                            <small>Full access to library management and resources</small>
+                                        </div>
+                                    {% elif user.student %}
+                                        <span class="badge-student">
+                                            <i class="fas fa-graduation-cap"></i>
+                                            Student
+                                        </span>
+                                        <div class="mt-2 text-muted">
+                                            <small>Access to borrow and read library books</small>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-user-circle"></i>
+                                    Username
+                                </label>
+                                <div class="form-control" style="background: #f3f4f6; cursor: not-allowed;">
+                                    {{ user.username }}
+                                </div>
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle"></i>
+                                    Username cannot be changed
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <div class="button-group">
+                            <a href="{% if user.staff or user.is_superuser %}{% url 'library:teacher_dashboard' %}{% else %}{% url 'library:student_dashboard' %}{% endif %}" class="btn-back">
+                                <i class="fas fa-arrow-left"></i>
+                                Back to Dashboard
+                            </a>
+                            <button type="submit" class="btn-update">
+                                <i class="fas fa-save"></i>
+                                Update Profile
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form field animations
+    const formControls = document.querySelectorAll('.form-control');
+    formControls.forEach(control => {
+        if (!control.hasAttribute('readonly') && !control.style.cursor.includes('not-allowed')) {
+            control.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.02)';
+            });
+            
+            control.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
+            });
+        }
+    });
+
+    // Form submission loading state
+    const form = document.querySelector('form');
+    const submitBtn = document.querySelector('.btn-update');
+    
+    if (form && submitBtn) {
+        form.addEventListener('submit', function() {
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Updating...';
+            submitBtn.disabled = true;
+        });
+    }
+
+    // Add ripple effect to buttons
+    function createRipple(event) {
+        const button = event.currentTarget;
+        const circle = document.createElement('span');
+        const diameter = Math.max(button.clientWidth, button.clientHeight);
+        const radius = diameter / 2;
+        
+        circle.style.width = circle.style.height = `${diameter}px`;
+        circle.style.left = `${event.clientX - button.offsetLeft - radius}px`;
+        circle.style.top = `${event.clientY - button.offsetTop - radius}px`;
+        circle.classList.add('ripple');
+        
+        const ripple = button.getElementsByClassName('ripple')[0];
+        if (ripple) {
+            ripple.remove();
+        }
+        
+        button.appendChild(circle);
+    }
+    
+    const buttons = document.querySelectorAll('.btn-update, .btn-back');
+    buttons.forEach(btn => {
+        btn.addEventListener('click', createRipple);
+    });
+
+    // Add CSS for ripple effect
+    const style = document.createElement('style');
+    style.textContent = `
+        .btn-update, .btn-back {
+            position: relative;
+            overflow: hidden;
+        }
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+        }
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Animate stats cards on scroll
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.animation = 'slideInUp 0.6s ease-out';
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.stat-card').forEach(card => {
+        observer.observe(card);
+    });
+});
+</script>
+{% endblock %}

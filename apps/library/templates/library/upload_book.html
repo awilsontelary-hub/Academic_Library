@@ -1,0 +1,750 @@
+{% extends 'library/base.html' %}
+
+{% block title %}Upload Book - AcademiaLink Library{% endblock %}
+
+{% block content %}
+<style>
+/* Upload Book Page Theme Variables */
+:root {
+    --library-primary: #1e3a8a;
+    --library-secondary: #3b82f6;
+    --library-accent: #0ea5e9;
+    --library-success: #059669;
+    --library-warning: #d97706;
+    --library-danger: #dc2626;
+    --library-light: #cbd5e1;
+    --library-dark: #334155;
+    --library-text: #1e293b;
+    --library-muted: #64748b;
+    --library-bg: #f8fafc;
+    --library-gradient: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    --library-gradient-light: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+}
+
+.upload-hero {
+    background: var(--library-gradient);
+    color: white;
+    padding: 4rem 0;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.upload-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+    opacity: 0.3;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+.upload-preview-card {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    text-align: center;
+}
+
+.enhanced-upload-card {
+    background: white;
+    border-radius: 25px;
+    box-shadow: 0 15px 35px rgba(30, 58, 138, 0.15);
+    border: none;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.enhanced-upload-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 25px 50px rgba(30, 58, 138, 0.2);
+}
+
+.enhanced-upload-card .card-header {
+    background: var(--library-gradient-light);
+    border-bottom: none;
+    padding: 2rem 2.5rem;
+    border-radius: 25px 25px 0 0;
+}
+
+.enhanced-upload-card .card-title {
+    color: var(--library-primary);
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.5rem;
+}
+
+.enhanced-upload-card .card-body {
+    padding: 2.5rem;
+}
+
+.enhanced-form-group {
+    margin-bottom: 2rem;
+}
+
+.enhanced-form-label {
+    color: var(--library-primary);
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.form-field-wrapper input,
+.form-field-wrapper select,
+.form-field-wrapper textarea {
+    border: 2px solid var(--library-light);
+    border-radius: 15px;
+    padding: 1rem 1.25rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #fafbfc;
+    width: 100%;
+}
+
+.form-field-wrapper input:focus,
+.form-field-wrapper select:focus,
+.form-field-wrapper textarea:focus {
+    border-color: var(--library-primary);
+    box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+    background: white;
+    outline: none;
+}
+
+.form-field-wrapper select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 1rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 3rem;
+}
+
+.form-field-wrapper textarea {
+    min-height: 120px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+.file-upload-section {
+    background: var(--library-gradient-light);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 2px dashed var(--library-primary);
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.file-upload-section:hover {
+    background: linear-gradient(135deg, #bfdbfe 0%, #93c5fd 100%);
+    transform: translateY(-2px);
+}
+
+.file-upload-icon {
+    font-size: 3rem;
+    color: var(--library-primary);
+    margin-bottom: 1rem;
+}
+
+.file-upload-text {
+    color: var(--library-primary);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.file-upload-help {
+    color: var(--library-muted);
+    font-size: 0.9rem;
+}
+
+.custom-file-input {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    height: 60px;
+    margin-top: 1rem;
+}
+
+.custom-file-input input[type="file"] {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.custom-file-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: var(--library-primary);
+    color: white;
+    border-radius: 15px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    gap: 0.5rem;
+}
+
+.custom-file-label:hover {
+    background: var(--library-secondary);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(30, 58, 138, 0.3);
+}
+
+.form-error {
+    color: var(--library-danger);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(220, 38, 38, 0.1);
+    border-radius: 8px;
+    border-left: 4px solid var(--library-danger);
+}
+
+.upload-guidelines {
+    background: linear-gradient(45deg, #ecfdf5, #d1fae5);
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border-left: 4px solid var(--library-success);
+}
+
+.upload-guidelines h6 {
+    color: var(--library-success);
+    font-weight: 700;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.upload-guidelines ul {
+    margin: 0;
+    padding-left: 1.5rem;
+    color: var(--library-text);
+}
+
+.upload-guidelines li {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid rgba(30, 58, 138, 0.1);
+}
+
+.btn-upload-secondary {
+    background: transparent;
+    border: 2px solid var(--library-light);
+    color: var(--library-muted);
+    font-weight: 600;
+    padding: 12px 24px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-upload-secondary:hover {
+    background: var(--library-muted);
+    color: white;
+    border-color: var(--library-muted);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(100, 116, 139, 0.3);
+    text-decoration: none;
+}
+
+.btn-upload-primary {
+    background: var(--library-gradient);
+    border: none;
+    color: white;
+    font-weight: 700;
+    padding: 12px 30px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.05rem;
+}
+
+.btn-upload-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(30, 58, 138, 0.4);
+    color: white;
+}
+
+.btn-upload-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
+}
+
+.progress-section {
+    display: none;
+    background: var(--library-gradient-light);
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+}
+
+.progress-bar-custom {
+    background: #e5e7eb;
+    border-radius: 10px;
+    height: 10px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    background: var(--library-gradient);
+    height: 100%;
+    width: 0%;
+    transition: width 0.3s ease;
+    border-radius: 10px;
+}
+
+.fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease;
+}
+
+.fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.pulse-icon {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .upload-hero {
+        padding: 2rem 0;
+    }
+    
+    .enhanced-upload-card .card-header,
+    .enhanced-upload-card .card-body {
+        padding: 1.5rem;
+    }
+    
+    .action-buttons {
+        flex-direction: column-reverse;
+        gap: 1rem;
+    }
+    
+    .action-buttons .btn-upload-primary,
+    .action-buttons .btn-upload-secondary {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+
+<!-- Hero Section -->
+<section class="upload-hero">
+    <div class="container">
+        <div class="hero-content fade-in">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <nav aria-label="breadcrumb" class="mb-3">
+                        <ol class="breadcrumb" style="background: transparent;">
+                            <li class="breadcrumb-item"><a href="{% url 'library:home' %}" class="text-white opacity-75">Home</a></li>
+                            <li class="breadcrumb-item"><a href="{% url 'library:teacher_dashboard' %}" class="text-white opacity-75">Teacher Dashboard</a></li>
+                            <li class="breadcrumb-item active text-white" aria-current="page">Upload Book</li>
+                        </ol>
+                    </nav>
+                    <h1 class="display-5 fw-bold mb-3">
+                        <i class="fas fa-cloud-upload-alt me-3 pulse-icon"></i>Upload New Book
+                    </h1>
+                    <p class="lead opacity-90 mb-4">Add new resources to the library collection and make them available to students.</p>
+                </div>
+                <div class="col-lg-4">
+                    <div class="upload-preview-card">
+                        <i class="fas fa-book-plus fa-3x mb-3"></i>
+                        <h5 class="mb-2">Expand the Library</h5>
+                        <p class="mb-0 opacity-75">Share knowledge with students</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="enhanced-upload-card fade-in">
+                <div class="card-header">
+                    <h4 class="card-title">
+                        <i class="fas fa-upload"></i>
+                        Book Upload Form
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Upload Guidelines -->
+                    <div class="upload-guidelines">
+                        <h6>
+                            <i class="fas fa-info-circle"></i>
+                            Upload Guidelines
+                        </h6>
+                        <ul>
+                            <li>Ensure all book information is accurate and complete</li>
+                            <li>Upload multiple file formats for better accessibility</li>
+                            <li>Supported formats: PDF, DOC, DOCX, TXT, JPG, PNG</li>
+                            <li>Maximum file size: 10MB per file</li>
+                            <li>Use descriptive titles and detailed descriptions</li>
+                        </ul>
+                    </div>
+
+                    <form method="post" enctype="multipart/form-data" id="uploadForm">
+                        {% csrf_token %}
+                        
+                        <!-- Book Information Section -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="enhanced-form-group">
+                                    <label for="{{ form.title.id_for_label }}" class="enhanced-form-label">
+                                        <i class="fas fa-book"></i>
+                                        Book Title *
+                                    </label>
+                                    <div class="form-field-wrapper">
+                                        {{ form.title }}
+                                    </div>
+                                    {% if form.title.errors %}
+                                        <div class="form-error">
+                                            <i class="fas fa-exclamation-triangle me-1"></i>
+                                            {{ form.title.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="enhanced-form-group">
+                                    <label for="{{ form.author.id_for_label }}" class="enhanced-form-label">
+                                        <i class="fas fa-user-edit"></i>
+                                        Author *
+                                    </label>
+                                    <div class="form-field-wrapper">
+                                        {{ form.author }}
+                                    </div>
+                                    {% if form.author.errors %}
+                                        <div class="form-error">
+                                            <i class="fas fa-exclamation-triangle me-1"></i>
+                                            {{ form.author.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="enhanced-form-group">
+                            <label for="{{ form.category.id_for_label }}" class="enhanced-form-label">
+                                <i class="fas fa-tags"></i>
+                                Category *
+                            </label>
+                            <div class="form-field-wrapper">
+                                {{ form.category }}
+                            </div>
+                            {% if form.category.errors %}
+                                <div class="form-error">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    {{ form.category.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="enhanced-form-group">
+                            <label for="{{ form.description.id_for_label }}" class="enhanced-form-label">
+                                <i class="fas fa-align-left"></i>
+                                Description
+                            </label>
+                            <div class="form-field-wrapper">
+                                {{ form.description }}
+                            </div>
+                            <small class="text-muted mt-2 d-block">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Provide a detailed description to help students understand the book's content and purpose.
+                            </small>
+                            {% if form.description.errors %}
+                                <div class="form-error">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    {{ form.description.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- File Upload Section -->
+                        <div class="enhanced-form-group">
+                            <label class="enhanced-form-label">
+                                <i class="fas fa-file-upload"></i>
+                                Book Files *
+                            </label>
+                            <div class="file-upload-section">
+                                <div class="file-upload-icon">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                </div>
+                                <div class="file-upload-text">Upload Book Files</div>
+                                <div class="file-upload-help">
+                                    Select multiple files (PDF, DOC, DOCX, TXT, JPG, PNG)
+                                </div>
+                                <div class="custom-file-input">
+                                    <input
+                                        type="file"
+                                        name="files"
+                                        id="files"
+                                        multiple
+                                        accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
+                                    />
+                                    <label for="files" class="custom-file-label">
+                                        <i class="fas fa-plus-circle"></i>
+                                        Choose Files
+                                    </label>
+                                </div>
+                                <div id="selectedFiles" class="mt-3"></div>
+                            </div>
+                        </div>
+
+                        <!-- Progress Section -->
+                        <div class="progress-section" id="progressSection">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted">Uploading...</span>
+                                <span id="progressPercent">0%</span>
+                            </div>
+                            <div class="progress-bar-custom">
+                                <div class="progress-bar-fill" id="progressBar"></div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="action-buttons">
+                            <a href="{% url 'library:teacher_dashboard' %}" class="btn-upload-secondary">
+                                <i class="fas fa-arrow-left"></i>
+                                Back to Dashboard
+                            </a>
+                            <button type="submit" class="btn-upload-primary" id="submitBtn">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                Upload Book
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Fade-in animation for cards
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, observerOptions);
+
+    // Observe all fade-in elements
+    document.querySelectorAll('.fade-in').forEach(el => {
+        observer.observe(el);
+    });
+
+    // Add ripple effect to buttons
+    document.querySelectorAll('.btn-upload-primary, .btn-upload-secondary').forEach(button => {
+        button.addEventListener('click', function(e) {
+            const ripple = document.createElement('span');
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+            
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            ripple.classList.add('ripple-effect');
+            
+            this.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+
+    // Enhanced file input handling
+    const fileInput = document.getElementById('files');
+    const selectedFilesDiv = document.getElementById('selectedFiles');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    if (fileInput) {
+        fileInput.addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            selectedFilesDiv.innerHTML = '';
+            
+            if (files.length > 0) {
+                const filesContainer = document.createElement('div');
+                filesContainer.className = 'selected-files-container';
+                
+                const title = document.createElement('h6');
+                title.textContent = `Selected Files (${files.length})`;
+                title.style.color = 'var(--library-primary)';
+                title.style.marginBottom = '1rem';
+                filesContainer.appendChild(title);
+                
+                files.forEach((file, index) => {
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'd-flex justify-content-between align-items-center p-2 mb-2 rounded';
+                    fileItem.style.background = 'rgba(30, 58, 138, 0.1)';
+                    fileItem.style.border = '1px solid rgba(30, 58, 138, 0.2)';
+                    
+                    const fileInfo = document.createElement('div');
+                    fileInfo.innerHTML = `
+                        <div class="fw-bold" style="color: var(--library-primary);">${file.name}</div>
+                        <small class="text-muted">${formatFileSize(file.size)} • ${getFileType(file.name)}</small>
+                    `;
+                    
+                    const fileIcon = document.createElement('div');
+                    fileIcon.innerHTML = `<i class="fas ${getFileIcon(file.name)} fa-lg" style="color: var(--library-primary);"></i>`;
+                    
+                    fileItem.appendChild(fileInfo);
+                    fileItem.appendChild(fileIcon);
+                    filesContainer.appendChild(fileItem);
+                });
+                
+                selectedFilesDiv.appendChild(filesContainer);
+            }
+        });
+    }
+
+    // Form submission with progress simulation
+    const uploadForm = document.getElementById('uploadForm');
+    const progressSection = document.getElementById('progressSection');
+    const progressBar = document.getElementById('progressBar');
+    const progressPercent = document.getElementById('progressPercent');
+    
+    if (uploadForm) {
+        uploadForm.addEventListener('submit', function(e) {
+            if (fileInput && fileInput.files.length === 0) {
+                e.preventDefault();
+                alert('Please select at least one file to upload.');
+                return;
+            }
+            
+            // Show progress section
+            progressSection.style.display = 'block';
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+            
+            // Simulate upload progress (remove this in production)
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress > 100) progress = 100;
+                
+                progressBar.style.width = progress + '%';
+                progressPercent.textContent = Math.round(progress) + '%';
+                
+                if (progress >= 100) {
+                    clearInterval(progressInterval);
+                }
+            }, 200);
+        });
+    }
+
+    // Helper functions
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    function getFileType(filename) {
+        const extension = filename.split('.').pop().toLowerCase();
+        const types = {
+            'pdf': 'PDF Document',
+            'doc': 'Word Document',
+            'docx': 'Word Document',
+            'txt': 'Text File',
+            'jpg': 'Image',
+            'jpeg': 'Image',
+            'png': 'Image'
+        };
+        return types[extension] || 'Unknown';
+    }
+    
+    function getFileIcon(filename) {
+        const extension = filename.split('.').pop().toLowerCase();
+        const icons = {
+            'pdf': 'fa-file-pdf',
+            'doc': 'fa-file-word',
+            'docx': 'fa-file-word',
+            'txt': 'fa-file-alt',
+            'jpg': 'fa-file-image',
+            'jpeg': 'fa-file-image',
+            'png': 'fa-file-image'
+        };
+        return icons[extension] || 'fa-file';
+    }
+
+    // Form validation enhancements
+    const formInputs = document.querySelectorAll('input, select, textarea');
+    formInputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            if (this.hasAttribute('required') && !this.value.trim()) {
+                this.style.borderColor = 'var(--library-danger)';
+            } else {
+                this.style.borderColor = 'var(--library-light)';
+            }
+        });
+        
+        input.addEventListener('input', function() {
+            if (this.style.borderColor === 'rgb(220, 38, 38)') {
+                this.style.borderColor = 'var(--library-light)';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

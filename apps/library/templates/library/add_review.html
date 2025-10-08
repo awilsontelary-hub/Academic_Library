@@ -1,0 +1,568 @@
+{% extends 'library/base.html' %}
+
+{% block title %}Review {{ book.title }} - AcademiaLink Library{% endblock %}
+
+{% block content %}
+<style>
+/* Add Review Page Theme Variables */
+:root {
+    --library-primary: #1e3a8a;
+    --library-secondary: #3b82f6;
+    --library-accent: #0ea5e9;
+    --library-success: #059669;
+    --library-warning: #d97706;
+    --library-danger: #dc2626;
+    --library-light: #cbd5e1;
+    --library-dark: #334155;
+    --library-text: #1e293b;
+    --library-muted: #64748b;
+    --library-bg: #f8fafc;
+    --library-gradient: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    --library-gradient-light: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+}
+
+.review-hero {
+    background: var(--library-gradient);
+    color: white;
+    padding: 4rem 0;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.review-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+    opacity: 0.3;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+.book-preview-card {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    text-align: center;
+}
+
+.enhanced-review-card {
+    background: white;
+    border-radius: 25px;
+    box-shadow: 0 15px 35px rgba(30, 58, 138, 0.15);
+    border: none;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.enhanced-review-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 25px 50px rgba(30, 58, 138, 0.2);
+}
+
+.enhanced-review-card .card-header {
+    background: var(--library-gradient-light);
+    border-bottom: none;
+    padding: 2rem 2.5rem;
+    border-radius: 25px 25px 0 0;
+}
+
+.enhanced-review-card .card-title {
+    color: var(--library-primary);
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.5rem;
+}
+
+.enhanced-review-card .card-body {
+    padding: 2.5rem;
+}
+
+.book-info-section {
+    background: var(--library-gradient-light);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+    border: 2px solid rgba(30, 58, 138, 0.1);
+}
+
+.book-title {
+    color: var(--library-primary);
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.book-author {
+    color: var(--library-muted);
+    font-weight: 500;
+    font-size: 1.1rem;
+}
+
+.enhanced-form-group {
+    margin-bottom: 2rem;
+}
+
+.enhanced-form-label {
+    color: var(--library-primary);
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.enhanced-form-control {
+    border: 2px solid var(--library-light);
+    border-radius: 15px;
+    padding: 1rem 1.25rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #fafbfc;
+}
+
+.enhanced-form-control:focus {
+    border-color: var(--library-primary);
+    box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+    background: white;
+    outline: none;
+}
+
+.form-field-wrapper select,
+.form-field-wrapper textarea,
+.form-field-wrapper input {
+    border: 2px solid var(--library-light);
+    border-radius: 15px;
+    padding: 1rem 1.25rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #fafbfc;
+    width: 100%;
+}
+
+.form-field-wrapper select:focus,
+.form-field-wrapper textarea:focus,
+.form-field-wrapper input:focus {
+    border-color: var(--library-primary);
+    box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+    background: white;
+    outline: none;
+}
+
+.form-field-wrapper select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 1rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 3rem;
+}
+
+.form-field-wrapper textarea {
+    min-height: 120px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+.rating-section {
+    background: linear-gradient(45deg, #fef3c7, #fde68a);
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    border: 2px solid rgba(251, 191, 36, 0.3);
+}
+
+.rating-stars {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-top: 0.5rem;
+}
+
+.star-icon {
+    font-size: 1.5rem;
+    color: #fbbf24;
+}
+
+.form-error {
+    color: var(--library-danger);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(220, 38, 38, 0.1);
+    border-radius: 8px;
+    border-left: 4px solid var(--library-danger);
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid rgba(30, 58, 138, 0.1);
+}
+
+.btn-review-secondary {
+    background: transparent;
+    border: 2px solid var(--library-light);
+    color: var(--library-muted);
+    font-weight: 600;
+    padding: 12px 24px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-review-secondary:hover {
+    background: var(--library-muted);
+    color: white;
+    border-color: var(--library-muted);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(100, 116, 139, 0.3);
+    text-decoration: none;
+}
+
+.btn-review-primary {
+    background: var(--library-gradient);
+    border: none;
+    color: white;
+    font-weight: 700;
+    padding: 12px 30px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.05rem;
+}
+
+.btn-review-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(30, 58, 138, 0.4);
+    color: white;
+}
+
+.review-tips {
+    background: linear-gradient(45deg, #ecfdf5, #d1fae5);
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border-left: 4px solid var(--library-success);
+}
+
+.review-tips h6 {
+    color: var(--library-success);
+    font-weight: 700;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.review-tips ul {
+    margin: 0;
+    padding-left: 1.5rem;
+    color: var(--library-text);
+}
+
+.review-tips li {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease;
+}
+
+.fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.pulse-icon {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .review-hero {
+        padding: 2rem 0;
+    }
+    
+    .enhanced-review-card .card-header,
+    .enhanced-review-card .card-body {
+        padding: 1.5rem;
+    }
+    
+    .action-buttons {
+        flex-direction: column-reverse;
+        gap: 1rem;
+    }
+    
+    .action-buttons .btn-review-primary,
+    .action-buttons .btn-review-secondary {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+
+<!-- Hero Section -->
+<section class="review-hero">
+    <div class="container">
+        <div class="hero-content fade-in">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <nav aria-label="breadcrumb" class="mb-3">
+                        <ol class="breadcrumb" style="background: transparent;">
+                            <li class="breadcrumb-item"><a href="{% url 'library:home' %}" class="text-white opacity-75">Home</a></li>
+                            <li class="breadcrumb-item"><a href="{% url 'library:book_list' %}" class="text-white opacity-75">Books</a></li>
+                            <li class="breadcrumb-item"><a href="{% url 'library:book_detail' book.id %}" class="text-white opacity-75">{{ book.title|truncatechars:20 }}</a></li>
+                            <li class="breadcrumb-item active text-white" aria-current="page">Add Review</li>
+                        </ol>
+                    </nav>
+                    <h1 class="display-5 fw-bold mb-3">
+                        <i class="fas fa-star me-3 pulse-icon"></i>Share Your Review
+                    </h1>
+                    <p class="lead opacity-90 mb-4">Help other readers discover great books by sharing your thoughts and rating.</p>
+                </div>
+                <div class="col-lg-4">
+                    <div class="book-preview-card">
+                        <i class="fas fa-book-open fa-3x mb-3"></i>
+                        <h5 class="mb-2">{{ book.title|truncatechars:25 }}</h5>
+                        <p class="mb-0 opacity-75">by {{ book.author }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="enhanced-review-card fade-in">
+                <div class="card-header">
+                    <h4 class="card-title">
+                        <i class="fas fa-star"></i>
+                        Write Your Review
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Book Information Section -->
+                    <div class="book-info-section">
+                        <div class="book-title">{{ book.title }}</div>
+                        <div class="book-author">by {{ book.author }}</div>
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                <i class="fas fa-tag me-1"></i>{{ book.category.name }}
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- Review Tips -->
+                    <div class="review-tips">
+                        <h6>
+                            <i class="fas fa-lightbulb"></i>
+                            Tips for Writing a Great Review
+                        </h6>
+                        <ul>
+                            <li>Share what you liked or didn't like about the book</li>
+                            <li>Mention the writing style, characters, or plot</li>
+                            <li>Be specific and honest in your feedback</li>
+                            <li>Help other readers understand if this book is right for them</li>
+                        </ul>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Rating Section -->
+                        <div class="enhanced-form-group">
+                            <label for="{{ form.rating.id_for_label }}" class="enhanced-form-label">
+                                <i class="fas fa-star"></i>
+                                Your Rating *
+                            </label>
+                            <div class="rating-section">
+                                <div class="text-center mb-2">
+                                    <strong>How would you rate this book?</strong>
+                                </div>
+                                <div class="form-field-wrapper">
+                                    {{ form.rating }}
+                                </div>
+                                <div class="rating-stars mt-2">
+                                    <i class="fas fa-star star-icon"></i>
+                                    <i class="fas fa-star star-icon"></i>
+                                    <i class="fas fa-star star-icon"></i>
+                                    <i class="fas fa-star star-icon"></i>
+                                    <i class="fas fa-star star-icon"></i>
+                                </div>
+                            </div>
+                            {% if form.rating.errors %}
+                                <div class="form-error">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    {{ form.rating.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Comment Section -->
+                        <div class="enhanced-form-group">
+                            <label for="{{ form.comment.id_for_label }}" class="enhanced-form-label">
+                                <i class="fas fa-comment"></i>
+                                Your Review
+                            </label>
+                            <div class="form-field-wrapper">
+                                {{ form.comment }}
+                            </div>
+                            <small class="text-muted mt-2 d-block">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Share your thoughts about the book. What did you think of the story, characters, or writing style?
+                            </small>
+                            {% if form.comment.errors %}
+                                <div class="form-error">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    {{ form.comment.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="action-buttons">
+                            <a href="{% url 'library:book_detail' book.id %}" class="btn-review-secondary">
+                                <i class="fas fa-arrow-left"></i>
+                                Back to Book
+                            </a>
+                            <button type="submit" class="btn-review-primary">
+                                <i class="fas fa-paper-plane"></i>
+                                Submit Review
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Fade-in animation for cards
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, observerOptions);
+
+    // Observe all fade-in elements
+    document.querySelectorAll('.fade-in').forEach(el => {
+        observer.observe(el);
+    });
+
+    // Add ripple effect to buttons
+    document.querySelectorAll('.btn-review-primary, .btn-review-secondary').forEach(button => {
+        button.addEventListener('click', function(e) {
+            const ripple = document.createElement('span');
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+            
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            ripple.classList.add('ripple-effect');
+            
+            this.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+
+    // Dynamic star rating visualization
+    const ratingSelect = document.querySelector('select[name="rating"]');
+    const stars = document.querySelectorAll('.star-icon');
+    
+    if (ratingSelect && stars.length > 0) {
+        function updateStars(rating) {
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.style.color = '#fbbf24';
+                    star.classList.add('fas');
+                    star.classList.remove('far');
+                } else {
+                    star.style.color = '#d1d5db';
+                    star.classList.add('far');
+                    star.classList.remove('fas');
+                }
+            });
+        }
+
+        // Update stars when selection changes
+        ratingSelect.addEventListener('change', function() {
+            const rating = parseInt(this.value) || 0;
+            updateStars(rating);
+        });
+
+        // Initialize stars based on current selection
+        const currentRating = parseInt(ratingSelect.value) || 0;
+        updateStars(currentRating);
+    }
+
+    // Enhanced form validation feedback
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const rating = document.querySelector('select[name="rating"]').value;
+            if (!rating) {
+                e.preventDefault();
+                const ratingSection = document.querySelector('.rating-section');
+                ratingSection.style.background = 'linear-gradient(45deg, #fecaca, #fca5a5)';
+                setTimeout(() => {
+                    ratingSection.style.background = 'linear-gradient(45deg, #fef3c7, #fde68a)';
+                }, 2000);
+            }
+        });
+    }
+});
+</script>
+        </div>
+    </div>
+</div>
+{% endblock %}

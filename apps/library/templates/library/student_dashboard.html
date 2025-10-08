@@ -1,0 +1,829 @@
+{% extends 'library/base.html' %}
+
+{% block title %}Student Dashboard - AcademiaLink Library{% endblock %}
+
+{% block content %}
+<style>
+/* Custom Library Theme CSS for Student Dashboard */
+:root {
+    --library-primary: #1e3a8a;
+    --library-secondary: #3b82f6;
+    --library-light: #dbeafe;
+    --library-accent: #0ea5e9;
+    --library-gradient: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #0ea5e9 100%);
+    --library-text: #1e293b;
+    --library-muted: #64748b;
+    --library-success: #059669;
+    --library-warning: #d97706;
+    --library-danger: #dc2626;
+}
+
+body {
+    background: linear-gradient(to bottom, #f8fafc, #e2e8f0);
+    min-height: 100vh;
+}
+
+.dashboard-hero {
+    background: var(--library-gradient);
+    padding: 3rem 0;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.dashboard-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="dashboard-pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><rect fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5" width="20" height="20"/><path fill="rgba(255,255,255,0.05)" d="M2 5h3v10h-3zm6 0h3v10h-3zm6 0h3v10h-3z"/></pattern></defs><rect width="100" height="100" fill="url(%23dashboard-pattern)"/></svg>') repeat;
+    opacity: 0.3;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    color: white;
+}
+
+.welcome-card {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 2rem;
+    color: white;
+}
+
+.enhanced-card {
+    background: white;
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(30, 58, 138, 0.1);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.enhanced-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--library-gradient);
+}
+
+.enhanced-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(30, 58, 138, 0.15);
+}
+
+.enhanced-card .card-header {
+    background: linear-gradient(45deg, #f8fafc, #e2e8f0);
+    border-bottom: 2px solid var(--library-light);
+    padding: 1.5rem 2rem;
+    border-radius: 20px 20px 0 0;
+}
+
+.enhanced-card .card-body {
+    padding: 2rem;
+}
+
+.card-title {
+    color: var(--library-primary);
+    font-weight: 700;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.overdue-alert {
+    background: linear-gradient(45deg, #fef3c7, #fde68a);
+    border: 2px solid var(--library-warning);
+    border-radius: 20px;
+    border-left: 5px solid var(--library-warning);
+    color: var(--library-warning);
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.overdue-alert::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--library-gradient);
+}
+
+.enhanced-table {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(30, 58, 138, 0.05);
+}
+
+.enhanced-table thead th {
+    background: var(--library-gradient);
+    color: white;
+    font-weight: 600;
+    border: none;
+    padding: 1rem;
+    text-align: center;
+}
+
+.enhanced-table tbody tr {
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.enhanced-table tbody tr:hover {
+    background: linear-gradient(45deg, #f8fafc, #e2e8f0);
+    transform: scale(1.01);
+}
+
+.enhanced-table tbody td {
+    padding: 1rem;
+    border: none;
+    vertical-align: middle;
+    text-align: center;
+}
+
+.status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 0.85rem;
+}
+
+.status-pending {
+    background: linear-gradient(45deg, #fef3c7, #fde68a);
+    color: var(--library-warning);
+}
+
+.status-approved {
+    background: linear-gradient(45deg, #d1fae5, #a7f3d0);
+    color: var(--library-success);
+}
+
+.status-rejected {
+    background: linear-gradient(45deg, #fecaca, #fca5a5);
+    color: var(--library-danger);
+}
+
+.status-returned {
+    background: linear-gradient(45deg, #e5e7eb, #d1d5db);
+    color: var(--library-muted);
+}
+
+.btn-library-primary {
+    background: var(--library-gradient);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-library-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(30, 58, 138, 0.4);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-library-outline {
+    border: 2px solid var(--library-primary);
+    color: var(--library-primary);
+    background: transparent;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 15px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.875rem;
+}
+
+.btn-library-outline:hover {
+    background: var(--library-primary);
+    color: white;
+    transform: scale(1.05);
+    text-decoration: none;
+}
+
+.btn-success-custom {
+    background: linear-gradient(45deg, #059669, #10b981);
+    border: none;
+    color: white;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    font-size: 0.8rem;
+}
+
+.btn-success-custom:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(5, 150, 105, 0.3);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-outline-success-custom {
+    border: 1px solid var(--library-success);
+    color: var(--library-success);
+    background: transparent;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    font-size: 0.8rem;
+}
+
+.btn-outline-success-custom:hover {
+    background: var(--library-success);
+    color: white;
+    text-decoration: none;
+}
+
+.no-books-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: linear-gradient(45deg, #f8fafc, #e2e8f0);
+    border-radius: 20px;
+    border: 2px dashed var(--library-light);
+}
+
+.quick-actions-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.quick-action-btn {
+    background: white;
+    border: 2px solid var(--library-light);
+    border-radius: 15px;
+    padding: 1.5rem 1rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: var(--library-text);
+    text-align: center;
+}
+
+.quick-action-btn:hover {
+    background: var(--library-primary);
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(30, 58, 138, 0.3);
+    text-decoration: none;
+}
+
+.quick-action-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.quick-action-text {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.recent-activities {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.activity-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(45deg, #f8fafc, #e2e8f0);
+    border-radius: 12px;
+    border-left: 4px solid var(--library-primary);
+    transition: all 0.3s ease;
+}
+
+.activity-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(30, 58, 138, 0.1);
+}
+
+.activity-icon {
+    margin-right: 1rem;
+    font-size: 1.2rem;
+}
+
+.activity-content {
+    flex-grow: 1;
+}
+
+.activity-title {
+    font-weight: 600;
+    color: var(--library-text);
+    margin-bottom: 0.25rem;
+}
+
+.activity-date {
+    color: var(--library-muted);
+    font-size: 0.8rem;
+    margin-bottom: 0.25rem;
+}
+
+.activity-status {
+    font-size: 0.8rem;
+    color: var(--library-muted);
+}
+
+.no-activity-state {
+    text-align: center;
+    padding: 2rem;
+    background: linear-gradient(45deg, #f8fafc, #e2e8f0);
+    border-radius: 15px;
+    border: 2px dashed var(--library-light);
+}
+
+.stats-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background: linear-gradient(45deg, #f8fafc, #e2e8f0);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(30, 58, 138, 0.1);
+}
+
+.stat-item.overdue {
+    background: linear-gradient(45deg, #fef3c7, #fde68a);
+    border-left: 4px solid var(--library-warning);
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    background: var(--library-gradient);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+    margin-right: 1rem;
+}
+
+.stat-item.overdue .stat-icon {
+    background: linear-gradient(45deg, #f59e0b, #d97706);
+}
+
+.stat-content {
+    flex-grow: 1;
+}
+
+.stat-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--library-primary);
+    margin-bottom: 0.25rem;
+}
+
+.stat-item.overdue .stat-number {
+    color: var(--library-warning);
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--library-muted);
+    font-weight: 500;
+}
+
+.fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease;
+}
+
+.fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.pulse-icon {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .dashboard-hero {
+        padding: 2rem 0;
+    }
+    
+    .enhanced-card .card-body {
+        padding: 1.5rem;
+    }
+    
+    .enhanced-table {
+        font-size: 0.875rem;
+    }
+    
+    .enhanced-table thead th,
+    .enhanced-table tbody td {
+        padding: 0.75rem 0.5rem;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Fade-in animation for cards
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, observerOptions);
+
+    // Observe all fade-in elements
+    document.querySelectorAll('.fade-in').forEach(el => {
+        observer.observe(el);
+    });
+
+    // Add ripple effect to buttons
+    document.querySelectorAll('.btn-library-primary, .btn-library-outline, .quick-action-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+            const ripple = document.createElement('span');
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+            
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            ripple.classList.add('ripple-effect');
+            
+            this.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+
+    // Enhance table rows with hover effects
+    document.querySelectorAll('.enhanced-table tbody tr').forEach(row => {
+        row.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.02)';
+            this.style.boxShadow = '0 8px 25px rgba(30, 58, 138, 0.15)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+            this.style.boxShadow = 'none';
+        });
+    });
+});
+</script>
+
+<!-- Hero Section -->
+<section class="dashboard-hero">
+    <div class="container">
+        <div class="hero-content fade-in">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <nav aria-label="breadcrumb" class="mb-3">
+                        <ol class="breadcrumb" style="background: transparent;">
+                            <li class="breadcrumb-item"><a href="{% url 'library:home' %}" class="text-white opacity-75">Home</a></li>
+                            <li class="breadcrumb-item active text-white" aria-current="page">Student Dashboard</li>
+                        </ol>
+                    </nav>
+                    <h1 class="display-5 fw-bold mb-3">
+                        <i class="fas fa-user-graduate me-3 pulse-icon"></i>Student Dashboard
+                    </h1>
+                    <p class="lead opacity-90 mb-4">Welcome back, {{ user.full_name }}! Manage your borrowed books and discover new resources.</p>
+                </div>
+                <div class="col-lg-4">
+                    <div class="welcome-card">
+                        <h5 class="mb-3">
+                            <i class="fas fa-chart-line me-2"></i>Your Library Stats
+                        </h5>
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <h3 class="mb-1">{{ borrowed_books.count }}</h3>
+                                <small>Active Loans</small>
+                            </div>
+                            <div class="col-6">
+                                <h3 class="mb-1">{{ recent_books.count|default:0 }}</h3>
+                                <small>New Books</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+    
+<div class="container">
+    <!-- Enhanced Overdue Books Alert -->
+    {% if overdue_books %}
+        <div class="overdue-alert alert" role="alert">
+            <div class="d-flex align-items-start">
+                <i class="fas fa-exclamation-triangle fa-2x me-3 mt-1"></i>
+                <div class="flex-grow-1">
+                    <h4 class="alert-heading fw-bold mb-3">Overdue Books Alert</h4>
+                    <p class="mb-3">You have <strong>{{ overdue_books.count }}</strong> overdue book{{ overdue_books.count|pluralize }} that need immediate attention.</p>
+                    <div class="overdue-list">
+                        {% for borrow in overdue_books %}
+                            <div class="d-flex justify-content-between align-items-center mb-2 p-2 rounded" style="background: rgba(255,255,255,0.3);">
+                                <div>
+                                    <strong>{{ borrow.book.title }}</strong>
+                                    <small class="d-block">by {{ borrow.book.author }}</small>
+                                </div>
+                                <div class="text-end">
+                                    <small>Due: {{ borrow.due_date|date:"M d, Y" }}</small>
+                                    <div class="mt-1">
+                                        <a href="{% url 'library:book_detail' borrow.book.id %}" class="btn btn-sm btn-outline-warning">
+                                            <i class="fas fa-eye me-1"></i>View Book
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="row">
+        <!-- Enhanced Borrowed Books Section -->
+        <div class="col-lg-8">
+            <div class="enhanced-card fade-in">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="fas fa-book-reader"></i>
+                        My Borrowed Books
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if borrowed_books %}
+                        <div class="table-responsive">
+                            <table class="table enhanced-table">
+                                <thead>
+                                    <tr>
+                                        <th><i class="fas fa-book me-1"></i>Book Title</th>
+                                        <th><i class="fas fa-user-edit me-1"></i>Author</th>
+                                        <th><i class="fas fa-calendar-plus me-1"></i>Borrowed</th>
+                                        <th><i class="fas fa-calendar-times me-1"></i>Due Date</th>
+                                        <th><i class="fas fa-info-circle me-1"></i>Status</th>
+                                        <th><i class="fas fa-cogs me-1"></i>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for borrow in borrowed_books %}
+                                        <tr>
+                                            <td>
+                                                <div class="book-info">
+                                                    <strong>{{ borrow.book.title|truncatechars:30 }}</strong>
+                                                    <small class="d-block text-muted">{{ borrow.book.category.name }}</small>
+                                                </div>
+                                            </td>
+                                            <td>{{ borrow.book.author }}</td>
+                                            <td>{{ borrow.borrowed_date|date:"M d, Y" }}</td>
+                                            <td>{{ borrow.due_date|date:"M d, Y" }}</td>
+                                            <td>
+                                                {% if borrow.status == 'pending' %}
+                                                    <span class="status-badge status-pending">
+                                                        <i class="fas fa-clock me-1"></i>Pending
+                                                    </span>
+                                                {% elif borrow.status == 'approved' %}
+                                                    <span class="status-badge status-approved">
+                                                        <i class="fas fa-check me-1"></i>Approved
+                                                    </span>
+                                                {% elif borrow.status == 'rejected' %}
+                                                    <span class="status-badge status-rejected">
+                                                        <i class="fas fa-times me-1"></i>Rejected
+                                                    </span>
+                                                {% elif borrow.status == 'returned' %}
+                                                    <span class="status-badge status-returned">
+                                                        <i class="fas fa-undo me-1"></i>Returned
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <div class="action-buttons">
+                                                    {% if borrow.status == 'approved' %}
+                                                        {% if borrow.book.files.all %}
+                                                            {% for file in borrow.book.files.all %}
+                                                                {% if forloop.first %}
+                                                                    <a href="{% url 'library:preview_book' file.id %}" class="btn-outline-success-custom me-1" target="_blank" title="Preview {{ file.file.name|slice:'7:' }}">
+                                                                        <i class="fas fa-eye"></i>
+                                                                    </a>
+                                                                    <a href="{% url 'library:download_book' file.id %}" class="btn-success-custom me-1" title="Download {{ file.file.name|slice:'7:' }}">
+                                                                        <i class="fas fa-download"></i>
+                                                                    </a>
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        {% endif %}
+                                                        
+                                                        <form method="post" action="{% url 'library:return_book' borrow.id %}" class="d-inline">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn-library-outline" onclick="return confirm('Are you sure you want to return this book?')">
+                                                                <i class="fas fa-undo"></i>
+                                                            </button>
+                                                        </form>
+                                                    {% endif %}
+                                                    <a href="{% url 'library:book_detail' borrow.book.id %}" class="btn-library-outline">
+                                                        <i class="fas fa-info-circle"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="no-books-state">
+                            <i class="fas fa-book-open fa-4x mb-4 pulse-icon" style="color: var(--library-light);"></i>
+                            <h5 style="color: var(--library-primary);">No borrowed books</h5>
+                            <p class="text-muted mb-4">You haven't borrowed any books yet. Start exploring our collection!</p>
+                            <a href="{% url 'library:book_list' %}" class="btn-library-primary">
+                                <i class="fas fa-search"></i> Browse Books
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Enhanced Sidebar with Quick Actions -->
+        <div class="col-lg-4">
+            <!-- Quick Actions Card -->
+            <div class="enhanced-card mb-4 fade-in">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="fas fa-bolt"></i>
+                        Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body text-center">
+                    <div class="quick-actions-grid">
+                        <a href="{% url 'library:book_list' %}" class="quick-action-btn">
+                            <div class="quick-action-icon">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <div class="quick-action-text">Browse Books</div>
+                        </a>
+                        <a href="{% url 'accounts:profile' %}" class="quick-action-btn">
+                            <div class="quick-action-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="quick-action-text">My Profile</div>
+                        </a>
+                        <a href="{% url 'library:student_dashboard' %}" class="quick-action-btn">
+                            <div class="quick-action-icon">
+                                <i class="fas fa-list"></i>
+                            </div>
+                            <div class="quick-action-text">My Books</div>
+                        </a>
+                        <a href="{% url 'accounts:logout' %}" class="quick-action-btn">
+                            <div class="quick-action-icon">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </div>
+                            <div class="quick-action-text">Logout</div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activities Card -->
+            <div class="enhanced-card mb-4 fade-in">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="fas fa-history"></i>
+                        Recent Activities
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if borrowed_books %}
+                        <div class="recent-activities">
+                            {% for borrow in borrowed_books|slice:":3" %}
+                                <div class="activity-item">
+                                    <div class="activity-icon">
+                                        {% if borrow.status == 'approved' %}
+                                            <i class="fas fa-check-circle text-success"></i>
+                                        {% elif borrow.status == 'pending' %}
+                                            <i class="fas fa-clock text-warning"></i>
+                                        {% elif borrow.status == 'rejected' %}
+                                            <i class="fas fa-times-circle text-danger"></i>
+                                        {% elif borrow.status == 'returned' %}
+                                            <i class="fas fa-undo text-info"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div class="activity-content">
+                                        <div class="activity-title">{{ borrow.book.title|truncatechars:25 }}</div>
+                                        <div class="activity-date">{{ borrow.borrowed_date|date:"M d, Y" }}</div>
+                                        <div class="activity-status">
+                                            Status: <span class="fw-bold">{{ borrow.status|title }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="no-activity-state">
+                            <i class="fas fa-clock fa-2x mb-2" style="color: var(--library-light);"></i>
+                            <p class="text-muted mb-0">No recent activities</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Library Statistics Card -->
+            <div class="enhanced-card fade-in">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="fas fa-chart-bar"></i>
+                        Your Library Stats
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="stats-list">
+                        <div class="stat-item">
+                            <div class="stat-icon">
+                                <i class="fas fa-book-reader"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number">{{ borrowed_books.count }}</div>
+                                <div class="stat-label">Books Borrowed</div>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-icon">
+                                <i class="fas fa-check-double"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number">{{ borrowed_books|length }}</div>
+                                <div class="stat-label">Total Requests</div>
+                            </div>
+                        </div>
+                        {% if overdue_books %}
+                            <div class="stat-item overdue">
+                                <div class="stat-icon">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <div class="stat-number">{{ overdue_books.count }}</div>
+                                    <div class="stat-label">Overdue Books</div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

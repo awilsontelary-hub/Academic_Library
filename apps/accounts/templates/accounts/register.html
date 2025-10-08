@@ -1,0 +1,600 @@
+{% extends 'library/base.html' %}
+
+{% block title %}Register - Online Library{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --library-primary: #1e3a8a;
+        --library-secondary: #3b82f6;
+        --library-accent: #60a5fa;
+        --library-light: #dbeafe;
+        --library-dark: #1e40af;
+        --library-success: #059669;
+        --library-warning: #d97706;
+        --library-danger: #dc2626;
+    }
+
+    .register-hero {
+        background: linear-gradient(135deg, var(--library-primary) 0%, var(--library-secondary) 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .register-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="books" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="20" height="20" fill="none"/><rect x="2" y="2" width="3" height="16" fill="rgba(255,255,255,0.1)"/><rect x="6" y="1" width="3" height="17" fill="rgba(255,255,255,0.05)"/><rect x="10" y="3" width="3" height="15" fill="rgba(255,255,255,0.08)"/><rect x="14" y="2" width="3" height="16" fill="rgba(255,255,255,0.06)"/></pattern></defs><rect width="100" height="100" fill="url(%23books)"/></svg>') repeat;
+        opacity: 0.3;
+    }
+
+    .register-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        animation: slideInUp 0.8s ease-out;
+    }
+
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .register-header {
+        background: linear-gradient(135deg, var(--library-primary), var(--library-secondary));
+        color: white;
+        padding: 2rem;
+        text-align: center;
+        position: relative;
+    }
+
+    .register-header::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 20px solid transparent;
+        border-right: 20px solid transparent;
+        border-top: 20px solid var(--library-secondary);
+    }
+
+    .register-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .register-subtitle {
+        margin: 0.5rem 0 0;
+        opacity: 0.9;
+        font-size: 1.1rem;
+    }
+
+    .register-form {
+        padding: 2.5rem;
+    }
+
+    .form-group {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: var(--library-primary);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-control {
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 12px 16px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #f9fafb;
+    }
+
+    .form-control:focus {
+        border-color: var(--library-secondary);
+        box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+        background: white;
+        transform: translateY(-2px);
+    }
+
+    .account-type-section {
+        background: linear-gradient(135deg, var(--library-light), #f0f9ff);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border: 2px solid var(--library-accent);
+    }
+
+    .account-type-title {
+        color: var(--library-primary);
+        font-weight: 700;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-check {
+        background: white;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        border: 2px solid #e5e7eb;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .form-check:hover {
+        border-color: var(--library-accent);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+    }
+
+    .form-check-input:checked + .form-check-label {
+        color: var(--library-primary);
+        font-weight: 600;
+    }
+
+    .form-check-input:checked {
+        background-color: var(--library-secondary);
+        border-color: var(--library-secondary);
+    }
+
+    .form-check-label {
+        font-size: 1.1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin: 0;
+    }
+
+    .btn-register {
+        background: linear-gradient(135deg, var(--library-primary), var(--library-secondary));
+        border: none;
+        border-radius: 12px;
+        padding: 14px 24px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: white;
+        width: 100%;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-register:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        background: linear-gradient(135deg, var(--library-dark), var(--library-primary));
+    }
+
+    .btn-register:active {
+        transform: translateY(0);
+    }
+
+    .btn-register::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .btn-register:hover::before {
+        left: 100%;
+    }
+
+    .login-link-section {
+        background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+        padding: 1.5rem;
+        text-align: center;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .login-link {
+        color: var(--library-secondary);
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .login-link:hover {
+        color: var(--library-primary);
+        text-decoration: none;
+    }
+
+    .login-link::after {
+        content: '';
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: -2px;
+        left: 50%;
+        background: var(--library-primary);
+        transition: all 0.3s ease;
+        transform: translateX(-50%);
+    }
+
+    .login-link:hover::after {
+        width: 100%;
+    }
+
+    .error-message {
+        background: linear-gradient(135deg, #fef2f2, #fee2e2);
+        color: var(--library-danger);
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        border-left: 4px solid var(--library-danger);
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+        animation: shake 0.5s ease-in-out;
+    }
+
+    @keyframes shake {
+        0%, 20%, 40%, 60%, 80%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    }
+
+    .floating-elements {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        pointer-events: none;
+    }
+
+    .floating-book {
+        position: absolute;
+        color: rgba(255, 255, 255, 0.1);
+        animation: float 6s ease-in-out infinite;
+    }
+
+    .floating-book:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+    .floating-book:nth-child(2) { top: 60%; right: 10%; animation-delay: 2s; }
+    .floating-book:nth-child(3) { bottom: 20%; left: 20%; animation-delay: 4s; }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(5deg); }
+    }
+
+    .form-step-indicator {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 2rem;
+    }
+
+    .step-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--library-secondary);
+        margin: 0 4px;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 0.5; }
+        50% { opacity: 1; }
+    }
+
+    @media (max-width: 768px) {
+        .register-hero {
+            min-height: auto;
+            padding: 2rem 0;
+        }
+        
+        .register-form {
+            padding: 1.5rem;
+        }
+        
+        .register-header {
+            padding: 1.5rem;
+        }
+        
+        .register-title {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="register-hero">
+    <div class="floating-elements">
+        <i class="fas fa-book floating-book fa-3x"></i>
+        <i class="fas fa-graduation-cap floating-book fa-2x"></i>
+        <i class="fas fa-university floating-book fa-3x"></i>
+    </div>
+    
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-xl-6">
+                <div class="register-card">
+                    <div class="register-header">
+                        <h1 class="register-title">
+                            <i class="fas fa-user-plus me-3"></i>
+                            Join Our Library
+                        </h1>
+                        <p class="register-subtitle">Create your account to access thousands of books</p>
+                        <div class="form-step-indicator">
+                            <div class="step-dot"></div>
+                            <div class="step-dot"></div>
+                            <div class="step-dot"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="register-form">
+                        <form method="post" novalidate>
+                            {% csrf_token %}
+                            
+                            <!-- Personal Information -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.first_name.id_for_label }}" class="form-label">
+                                            <i class="fas fa-user"></i>
+                                            First Name
+                                        </label>
+                                        {{ form.first_name }}
+                                        {% if form.first_name.errors %}
+                                            <div class="error-message">
+                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                {{ form.first_name.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.last_name.id_for_label }}" class="form-label">
+                                            <i class="fas fa-user"></i>
+                                            Last Name
+                                        </label>
+                                        {{ form.last_name }}
+                                        {% if form.last_name.errors %}
+                                            <div class="error-message">
+                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                {{ form.last_name.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Account Information -->
+                            <div class="form-group">
+                                <label for="{{ form.username.id_for_label }}" class="form-label">
+                                    <i class="fas fa-at"></i>
+                                    Username
+                                </label>
+                                {{ form.username }}
+                                {% if form.username.errors %}
+                                    <div class="error-message">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        {{ form.username.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="{{ form.email.id_for_label }}" class="form-label">
+                                    <i class="fas fa-envelope"></i>
+                                    Email Address
+                                </label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                    <div class="error-message">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        {{ form.email.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Account Type Selection -->
+                            <div class="account-type-section">
+                                <div class="account-type-title">
+                                    <i class="fas fa-users"></i>
+                                    Account Type
+                                </div>
+                                <div class="form-check">
+                                    {{ form.is_student }}
+                                    <label class="form-check-label" for="{{ form.is_student.id_for_label }}">
+                                        <i class="fas fa-graduation-cap"></i>
+                                        <div>
+                                            <strong>Student</strong>
+                                            <div class="text-muted small">Access to borrow and read books</div>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    {{ form.is_staff }}
+                                    <label class="form-check-label" for="{{ form.is_staff.id_for_label }}">
+                                        <i class="fas fa-chalkboard-teacher"></i>
+                                        <div>
+                                            <strong>Staff</strong>
+                                            <div class="text-muted small">Full access to library management</div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Password Fields -->
+                            <div class="form-group">
+                                <label for="{{ form.password1.id_for_label }}" class="form-label">
+                                    <i class="fas fa-lock"></i>
+                                    Password
+                                </label>
+                                {{ form.password1 }}
+                                {% if form.password1.errors %}
+                                    <div class="error-message">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        {{ form.password1.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="{{ form.password2.id_for_label }}" class="form-label">
+                                    <i class="fas fa-lock"></i>
+                                    Confirm Password
+                                </label>
+                                {{ form.password2 }}
+                                {% if form.password2.errors %}
+                                    <div class="error-message">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        {{ form.password2.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-register">
+                                    <i class="fas fa-user-plus me-2"></i>
+                                    Create My Account
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div class="login-link-section">
+                        <p class="mb-0">
+                            <i class="fas fa-sign-in-alt me-2 text-muted"></i>
+                            Already have an account? 
+                            <a href="{% url 'accounts:login' %}" class="login-link">Sign in here</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form field animations
+    const formControls = document.querySelectorAll('.form-control');
+    formControls.forEach(control => {
+        control.addEventListener('focus', function() {
+            this.parentElement.style.transform = 'scale(1.02)';
+        });
+        
+        control.addEventListener('blur', function() {
+            this.parentElement.style.transform = 'scale(1)';
+        });
+    });
+
+    // Account type selection animation
+    const formChecks = document.querySelectorAll('.form-check');
+    formChecks.forEach(check => {
+        const input = check.querySelector('input[type="radio"]');
+        
+        check.addEventListener('click', function() {
+            // Remove active class from all checks
+            formChecks.forEach(c => c.classList.remove('border-primary', 'bg-light'));
+            
+            // Add active class to clicked check
+            if (input.checked) {
+                this.classList.add('border-primary', 'bg-light');
+            }
+        });
+        
+        // Set initial state
+        if (input.checked) {
+            check.classList.add('border-primary', 'bg-light');
+        }
+    });
+
+    // Form submission loading state
+    const form = document.querySelector('form');
+    const submitBtn = document.querySelector('.btn-register');
+    
+    form.addEventListener('submit', function() {
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating Account...';
+        submitBtn.disabled = true;
+    });
+
+    // Add ripple effect to buttons
+    function createRipple(event) {
+        const button = event.currentTarget;
+        const circle = document.createElement('span');
+        const diameter = Math.max(button.clientWidth, button.clientHeight);
+        const radius = diameter / 2;
+        
+        circle.style.width = circle.style.height = `${diameter}px`;
+        circle.style.left = `${event.clientX - button.offsetLeft - radius}px`;
+        circle.style.top = `${event.clientY - button.offsetTop - radius}px`;
+        circle.classList.add('ripple');
+        
+        const ripple = button.getElementsByClassName('ripple')[0];
+        if (ripple) {
+            ripple.remove();
+        }
+        
+        button.appendChild(circle);
+    }
+    
+    const buttons = document.querySelectorAll('.btn-register');
+    buttons.forEach(btn => {
+        btn.addEventListener('click', createRipple);
+    });
+
+    // Add CSS for ripple effect
+    const style = document.createElement('style');
+    style.textContent = `
+        .btn-register {
+            position: relative;
+            overflow: hidden;
+        }
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+        }
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+});
+</script>
+{% endblock %}

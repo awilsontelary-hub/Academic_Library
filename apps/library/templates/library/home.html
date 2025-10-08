@@ -1,0 +1,599 @@
+{% extends 'library/base.html' %}
+
+{% block title %}Home - Online Library{% endblock %}
+
+{% block content %}
+<style>
+/* Custom Library Theme CSS */
+:root {
+    --library-primary: #1e3a8a;
+    --library-secondary: #3b82f6;
+    --library-light: #dbeafe;
+    --library-accent: #0ea5e9;
+    --library-gradient: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #0ea5e9 100%);
+    --library-text: #1e293b;
+    --library-muted: #64748b;
+}
+
+.hero-section {
+    background: var(--library-gradient);
+    position: relative;
+    overflow: hidden;
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="books" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><rect fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5" width="20" height="20"/><path fill="rgba(255,255,255,0.05)" d="M2 5h3v10h-3zm6 0h3v10h-3zm6 0h3v10h-3z"/></pattern></defs><rect width="100" height="100" fill="url(%23books)"/></svg>') repeat;
+    opacity: 0.3;
+}
+
+.hero-section .container {
+    position: relative;
+    z-index: 2;
+}
+
+.floating-books {
+    position: absolute;
+    right: 10%;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12rem;
+    color: rgba(255, 255, 255, 0.1);
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(-50%) rotate(0deg); }
+    50% { transform: translateY(-60%) rotate(5deg); }
+}
+
+.btn-library-primary {
+    background: linear-gradient(45deg, #1e3a8a, #3b82f6);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 12px 30px;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
+}
+
+.btn-library-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(30, 58, 138, 0.4);
+    background: linear-gradient(45deg, #1e40af, #2563eb);
+    color: white;
+}
+
+.btn-library-outline {
+    border: 2px solid white;
+    color: white;
+    background: transparent;
+    font-weight: 600;
+    padding: 12px 30px;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+}
+
+.btn-library-outline:hover {
+    background: white;
+    color: var(--library-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
+}
+
+.stats-section {
+    background: linear-gradient(to bottom, #f8fafc, #e2e8f0);
+    position: relative;
+}
+
+.stats-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(30, 58, 138, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.stats-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--library-gradient);
+}
+
+.stats-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(30, 58, 138, 0.15);
+}
+
+.stats-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 2rem;
+    transition: all 0.3s ease;
+}
+
+.stats-icon.books {
+    background: linear-gradient(45deg, #dbeafe, #bfdbfe);
+    color: var(--library-primary);
+}
+
+.stats-icon.users {
+    background: linear-gradient(45deg, #dcfce7, #bbf7d0);
+    color: #059669;
+}
+
+.stats-icon.downloads {
+    background: linear-gradient(45deg, #fef3c7, #fde68a);
+    color: #d97706;
+}
+
+.stats-card:hover .stats-icon {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.section-divider {
+    height: 2px;
+    background: var(--library-gradient);
+    margin: 3rem 0;
+    border-radius: 2px;
+}
+
+.featured-section {
+    background: white;
+    position: relative;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    position: relative;
+}
+
+.section-title {
+    color: var(--library-primary);
+    font-weight: 700;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    position: relative;
+    display: inline-block;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: var(--library-gradient);
+    border-radius: 2px;
+}
+
+.book-card {
+    background: white;
+    border-radius: 15px;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(30, 58, 138, 0.1);
+    overflow: hidden;
+}
+
+.book-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(30, 58, 138, 0.15);
+}
+
+.book-card .card-body {
+    padding: 1.5rem;
+}
+
+.book-card .card-title {
+    color: var(--library-primary);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.book-card .badge {
+    background: var(--library-gradient) !important;
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+}
+
+.btn-book-detail {
+    background: linear-gradient(45deg, #e0f2fe, #b3e5fc);
+    color: var(--library-primary);
+    border: 1px solid var(--library-light);
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.btn-book-detail:hover {
+    background: var(--library-primary);
+    color: white;
+    transform: scale(1.05);
+}
+
+.cta-section {
+    background: var(--library-gradient);
+    position: relative;
+    overflow: hidden;
+}
+
+.cta-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="40" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="70" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="70" cy="20" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="30" cy="90" r="2" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+    animation: sparkle 20s linear infinite;
+}
+
+@keyframes sparkle {
+    0% { transform: translateX(0) translateY(0); }
+    100% { transform: translateX(-100px) translateY(-100px); }
+}
+
+.fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease;
+}
+
+.fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.pulse-icon {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .hero-section {
+        min-height: 60vh;
+        text-align: center;
+    }
+    
+    .floating-books {
+        display: none;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+}
+</style>
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <div class="fade-in">
+                    <h1 class="display-3 fw-bold mb-4 text-white">Welcome to Our Digital Library</h1>
+                    <p class="lead mb-4 text-white opacity-90">Discover thousands of academic resources, borrow books, and enhance your learning journey with our comprehensive digital library platform.</p>
+                    <div class="d-flex flex-wrap gap-3 mt-4">
+                        <a href="{% url 'library:book_list' %}" class="btn btn-library-primary btn-lg">
+                            <i class="fas fa-search me-2"></i> Browse Books
+                        </a>
+                        {% if not user.is_authenticated %}
+                            <a href="{% url 'accounts:register' %}" class="btn btn-library-outline btn-lg">
+                                <i class="fas fa-user-plus me-2"></i> Join Now
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5 position-relative">
+                <div class="floating-books">
+                    <i class="fas fa-book-open pulse-icon"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Statistics Section -->
+<section class="stats-section py-5">
+    <div class="container">
+        <div class="section-divider mx-auto" style="width: 100px;"></div>
+        {% if user.is_superuser %}
+        <div class="text-center mb-4">
+            <h2 class="section-title">Library Statistics</h2>
+            <p class="lead text-muted">Real-time analytics and insights</p>
+            <a href="{% url 'library:statistics' %}" class="btn btn-library-primary">
+                <i class="fas fa-chart-bar me-2"></i>View Detailed Statistics
+            </a>
+        </div>
+        {% endif %}
+        <div class="row justify-content-center">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="stats-card text-center fade-in">
+                    <div class="stats-icon books">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <h3 class="fw-bold mb-2" style="color: var(--library-primary); font-size: 2.5rem;">{{ total_books }}</h3>
+                    <p class="text-muted mb-0 fw-500">Total Books Available</p>
+                </div>
+            </div>
+            {% if user.is_superuser %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="stats-card text-center fade-in">
+                    <div class="stats-icon users">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="fw-bold mb-2" style="color: #059669; font-size: 2.5rem;">{{ total_users }}</h3>
+                    <p class="text-muted mb-0 fw-500">Active Users</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="stats-card text-center fade-in">
+                    <div class="stats-icon downloads">
+                        <i class="fas fa-download"></i>
+                    </div>
+                    <h3 class="fw-bold mb-2" style="color: #d97706; font-size: 2.5rem;">{{ total_downloads }}</h3>
+                    <p class="text-muted mb-0 fw-500">Total Downloads</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Featured Books Section -->
+<section class="featured-section py-5">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Featured Books</h2>
+            <p class="lead text-muted">Discover our handpicked collection of exceptional academic resources</p>
+        </div>
+        <div class="row">
+            {% for book in featured_books %}
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card book-card h-100 fade-in">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ book.title }}</h5>
+                            <p class="card-text text-muted mb-2"><i class="fas fa-user-edit me-1"></i> by {{ book.author }}</p>
+                            <p class="card-text">{{ book.description|truncatewords:20 }}</p>
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <span class="badge">
+                                    <i class="fas fa-tag me-1"></i>{{ book.category.name }}
+                                </span>
+                                <a href="{% url 'library:book_detail' book.id %}" class="btn btn-book-detail">
+                                    <i class="fas fa-eye me-1"></i>View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12 text-center fade-in">
+                    <div class="p-5">
+                        <i class="fas fa-book-open fa-4x text-muted mb-3"></i>
+                        <p class="text-muted fs-5">No featured books available yet.</p>
+                        <p class="text-muted">Check back soon for our latest collection!</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-5">
+            <a href="{% url 'library:book_list' %}" class="btn btn-library-primary btn-lg">
+                <i class="fas fa-book-open me-2"></i>Explore All Books
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Recent Books Section -->
+{% if recent_books %}
+<section class="py-5" style="background: linear-gradient(to bottom, #f8fafc, white);">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Recently Added</h2>
+            <p class="lead text-muted">Fresh additions to our growing collection</p>
+        </div>
+        <div class="row">
+            {% for book in recent_books %}
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card book-card h-100 fade-in">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ book.title }}</h5>
+                            <p class="card-text text-muted mb-2"><i class="fas fa-user-edit me-1"></i> by {{ book.author }}</p>
+                            <p class="card-text">{{ book.description|truncatewords:15 }}</p>
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar-plus me-1"></i>{{ book.created_at|date:"M d, Y" }}
+                                </small>
+                                <a href="{% url 'library:book_detail' book.id %}" class="btn btn-book-detail">
+                                    <i class="fas fa-eye me-1"></i>View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Call to Action Section -->
+{% if not user.is_authenticated %}
+<section class="cta-section py-5">
+    <div class="container text-center position-relative">
+        <div class="fade-in">
+            <h2 class="mb-4 text-white fw-bold">Ready to Begin Your Learning Journey?</h2>
+            <p class="lead mb-5 text-white opacity-90">Join our vibrant community of learners and educators today!</p>
+            <a href="{% url 'accounts:register' %}" class="btn btn-library-outline btn-lg">
+                <i class="fas fa-user-plus me-2"></i> Create Your Account
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<script>
+// JavaScript for animations and interactions
+document.addEventListener('DOMContentLoaded', function() {
+    // Fade in animation on scroll
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, observerOptions);
+
+    // Observe all elements with fade-in class
+    document.querySelectorAll('.fade-in').forEach(el => {
+        observer.observe(el);
+    });
+
+    // Add hover effects to book cards
+    document.querySelectorAll('.book-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px) scale(1.02)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+
+    // Add click effect to buttons
+    document.querySelectorAll('.btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            let ripple = document.createElement('span');
+            ripple.classList.add('ripple');
+            this.appendChild(ripple);
+            
+            let x = e.clientX - e.target.offsetLeft;
+            let y = e.clientY - e.target.offsetTop;
+            
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+
+    // Counter animation for statistics
+    function animateCounter(element, target) {
+        let current = 0;
+        const increment = target / 100;
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+                element.textContent = target;
+                clearInterval(timer);
+            } else {
+                element.textContent = Math.floor(current);
+            }
+        }, 20);
+    }
+
+    // Animate counters when visible
+    const statsCards = document.querySelectorAll('.stats-card h3');
+    const statsObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const target = parseInt(entry.target.textContent.replace(/\D/g, ''));
+                if (target && !isNaN(target)) {
+                    animateCounter(entry.target, target);
+                }
+                statsObserver.unobserve(entry.target);
+            }
+        });
+    });
+
+    statsCards.forEach(card => {
+        statsObserver.observe(card);
+    });
+});
+</script>
+
+<style>
+/* Additional button ripple effect */
+.btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    transform: scale(0);
+    animation: ripple-animation 0.6s linear;
+    pointer-events: none;
+}
+
+@keyframes ripple-animation {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+    transition: all 0.3s ease;
+}
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--library-gradient);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--library-primary);
+}
+</style>
+{% endblock %}
