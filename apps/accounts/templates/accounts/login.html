@@ -24,17 +24,6 @@
         overflow: hidden;
     }
 
-    .login-hero::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="books" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="20" height="20" fill="none"/><rect x="2" y="2" width="3" height="16" fill="rgba(255,255,255,0.1)"/><rect x="6" y="1" width="3" height="17" fill="rgba(255,255,255,0.05)"/><rect x="10" y="3" width="3" height="15" fill="rgba(255,255,255,0.08)"/><rect x="14" y="2" width="3" height="16" fill="rgba(255,255,255,0.06)"/></pattern></defs><rect width="100" height="100" fill="url(%23books)"/></svg>') repeat;
-        opacity: 0.3;
-    }
-
     .login-container {
         position: relative;
         z-index: 2;
@@ -47,20 +36,8 @@
         border-radius: 20px;
         box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
         overflow: hidden;
-        animation: slideInUp 0.8s ease-out;
         max-width: 450px;
         margin: 0 auto;
-    }
-
-    @keyframes slideInUp {
-        from {
-            opacity: 0;
-            transform: translateY(50px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
     }
 
     .login-header {
@@ -69,19 +46,6 @@
         padding: 2.5rem 2rem;
         text-align: center;
         position: relative;
-    }
-
-    .login-header::after {
-        content: '';
-        position: absolute;
-        bottom: -15px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 0;
-        height: 0;
-        border-left: 25px solid transparent;
-        border-right: 25px solid transparent;
-        border-top: 25px solid var(--library-secondary);
     }
 
     .login-logo {
@@ -93,18 +57,6 @@
         align-items: center;
         justify-content: center;
         margin: 0 auto 1rem;
-        animation: pulse 3s infinite;
-    }
-
-    @keyframes pulse {
-        0%, 100% { 
-            box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
-            transform: scale(1);
-        }
-        50% { 
-            box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
-            transform: scale(1.05);
-        }
     }
 
     .login-logo i {
@@ -174,7 +126,6 @@
         border-color: var(--library-secondary);
         box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
         background: white;
-        transform: translateY(-2px);
     }
 
     .btn-login {
@@ -187,34 +138,12 @@
         color: white;
         width: 100%;
         transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
         margin-top: 1rem;
     }
 
     .btn-login:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
         background: linear-gradient(135deg, var(--library-dark), var(--library-primary));
-    }
-
-    .btn-login:active {
-        transform: translateY(0);
-    }
-
-    .btn-login::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-        transition: left 0.5s;
-    }
-
-    .btn-login:hover::before {
-        left: 100%;
+        color: white;
     }
 
     .register-link-section {
@@ -228,29 +157,12 @@
         color: var(--library-secondary);
         text-decoration: none;
         font-weight: 600;
-        transition: all 0.3s ease;
-        position: relative;
+        transition: color 0.3s ease;
     }
 
     .register-link:hover {
         color: var(--library-primary);
         text-decoration: none;
-    }
-
-    .register-link::after {
-        content: '';
-        position: absolute;
-        width: 0;
-        height: 2px;
-        bottom: -2px;
-        left: 50%;
-        background: var(--library-primary);
-        transition: all 0.3s ease;
-        transform: translateX(-50%);
-    }
-
-    .register-link:hover::after {
-        width: 100%;
     }
 
     .error-message {
@@ -261,38 +173,6 @@
         border-left: 4px solid var(--library-danger);
         margin-top: 0.5rem;
         font-size: 0.9rem;
-        animation: shake 0.5s ease-in-out;
-    }
-
-    @keyframes shake {
-        0%, 20%, 40%, 60%, 80%, 100% { transform: translateX(0); }
-        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-    }
-
-    .floating-elements {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        pointer-events: none;
-    }
-
-    .floating-book {
-        position: absolute;
-        color: rgba(255, 255, 255, 0.1);
-        animation: float 6s ease-in-out infinite;
-    }
-
-    .floating-book:nth-child(1) { top: 15%; left: 5%; animation-delay: 0s; }
-    .floating-book:nth-child(2) { top: 70%; right: 5%; animation-delay: 2s; }
-    .floating-book:nth-child(3) { bottom: 15%; left: 15%; animation-delay: 4s; }
-    .floating-book:nth-child(4) { top: 40%; right: 20%; animation-delay: 6s; }
-
-    @keyframes float {
-        0%, 100% { transform: translateY(0) rotate(0deg); }
-        50% { transform: translateY(-20px) rotate(5deg); }
     }
 
     .remember-me {
@@ -354,48 +234,11 @@
             margin: 1rem;
         }
     }
-
-    .social-login {
-        margin: 1.5rem 0;
-    }
-
-    .divider {
-        text-align: center;
-        margin: 1.5rem 0;
-        position: relative;
-        color: #9ca3af;
-        font-size: 0.9rem;
-    }
-
-    .divider::before {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: #e5e7eb;
-        z-index: 1;
-    }
-
-    .divider span {
-        background: white;
-        padding: 0 1rem;
-        position: relative;
-        z-index: 2;
-    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="login-hero">
-    <div class="floating-elements">
-        <i class="fas fa-book floating-book fa-3x"></i>
-        <i class="fas fa-graduation-cap floating-book fa-2x"></i>
-        <i class="fas fa-university floating-book fa-3x"></i>
-        <i class="fas fa-bookmark floating-book fa-2x"></i>
-    </div>
-    
     <div class="container login-container">
         <div class="row justify-content-center">
             <div class="col-lg-5 col-md-7 col-sm-9">
@@ -483,77 +326,4 @@
         </div>
     </div>
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Form field animations
-    const formControls = document.querySelectorAll('.form-control');
-    formControls.forEach(control => {
-        control.addEventListener('focus', function() {
-            this.parentElement.style.transform = 'scale(1.02)';
-        });
-        
-        control.addEventListener('blur', function() {
-            this.parentElement.style.transform = 'scale(1)';
-        });
-    });
-
-    // Form submission loading state
-    const form = document.querySelector('form');
-    const submitBtn = document.querySelector('.btn-login');
-    
-    form.addEventListener('submit', function() {
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Signing In...';
-        submitBtn.disabled = true;
-    });
-
-    // Add ripple effect to buttons
-    function createRipple(event) {
-        const button = event.currentTarget;
-        const circle = document.createElement('span');
-        const diameter = Math.max(button.clientWidth, button.clientHeight);
-        const radius = diameter / 2;
-        
-        circle.style.width = circle.style.height = `${diameter}px`;
-        circle.style.left = `${event.clientX - button.offsetLeft - radius}px`;
-        circle.style.top = `${event.clientY - button.offsetTop - radius}px`;
-        circle.classList.add('ripple');
-        
-        const ripple = button.getElementsByClassName('ripple')[0];
-        if (ripple) {
-            ripple.remove();
-        }
-        
-        button.appendChild(circle);
-    }
-    
-    const buttons = document.querySelectorAll('.btn-login');
-    buttons.forEach(btn => {
-        btn.addEventListener('click', createRipple);
-    });
-
-    // Add CSS for ripple effect
-    const style = document.createElement('style');
-    style.textContent = `
-        .btn-login {
-            position: relative;
-            overflow: hidden;
-        }
-        .ripple {
-            position: absolute;
-            border-radius: 50%;
-            background-color: rgba(255, 255, 255, 0.5);
-            transform: scale(0);
-            animation: ripple 0.6s linear;
-        }
-        @keyframes ripple {
-            to {
-                transform: scale(4);
-                opacity: 0;
-            }
-        }
-    `;
-    document.head.appendChild(style);
-});
-</script>
 {% endblock %}

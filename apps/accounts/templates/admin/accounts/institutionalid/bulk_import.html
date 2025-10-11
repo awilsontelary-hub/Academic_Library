@@ -1,0 +1,123 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+    &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+    &rsaquo; <a href="{% url 'admin:accounts_institutionalid_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+    &rsaquo; {{ title }}
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="change-form-container">
+    <h1>{{ title }}</h1>
+    
+    <div class="card" style="margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+        <h3>CSV Format Instructions</h3>
+        <p>Please upload a CSV file with the following columns (header row required):</p>
+        <table class="table" style="margin: 10px 0;">
+            <thead>
+                <tr>
+                    <th>Column Name</th>
+                    <th>Required</th>
+                    <th>Description</th>
+                    <th>Example</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>institutional_id</code></td>
+                    <td>Yes</td>
+                    <td>Unique institutional identifier</td>
+                    <td>STU2024001, EMP2024001</td>
+                </tr>
+                <tr>
+                    <td><code>account_type</code></td>
+                    <td>No</td>
+                    <td>Either 'student' or 'staff' (default: student)</td>
+                    <td>student, staff</td>
+                </tr>
+                <tr>
+                    <td><code>first_name</code></td>
+                    <td>No</td>
+                    <td>User's first name</td>
+                    <td>John</td>
+                </tr>
+                <tr>
+                    <td><code>last_name</code></td>
+                    <td>No</td>
+                    <td>User's last name</td>
+                    <td>Doe</td>
+                </tr>
+                <tr>
+                    <td><code>email</code></td>
+                    <td>No</td>
+                    <td>User's email address</td>
+                    <td>john.doe@university.edu</td>
+                </tr>
+                <tr>
+                    <td><code>academic_level</code></td>
+                    <td>No</td>
+                    <td>Academic level (for students)</td>
+                    <td>Undergraduate, Graduate, PhD</td>
+                </tr>
+                <tr>
+                    <td><code>department</code></td>
+                    <td>No</td>
+                    <td>Department or faculty</td>
+                    <td>Computer Science, Engineering</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 4px; border-left: 4px solid #007cba;">
+            <h4>Sample CSV Content:</h4>
+            <pre style="background: white; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 12px;">institutional_id,account_type,first_name,last_name,email,academic_level,department
+STU2024001,student,John,Doe,john.doe@university.edu,Undergraduate,Computer Science
+STU2024002,student,Jane,Smith,jane.smith@university.edu,Graduate,Engineering
+EMP2024001,staff,Dr. Robert,Johnson,robert.johnson@university.edu,,Computer Science</pre>
+        </div>
+    </div>
+    
+    <form method="post" enctype="multipart/form-data" class="aligned">
+        {% csrf_token %}
+        
+        <div class="form-row">
+            <div>
+                <label for="{{ form.csv_file.id_for_label }}">{{ form.csv_file.label }}:</label>
+                {{ form.csv_file }}
+                {% if form.csv_file.help_text %}
+                    <p class="help">{{ form.csv_file.help_text }}</p>
+                {% endif %}
+                {% if form.csv_file.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.csv_file.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="submit-row">
+            <input type="submit" value="Import IDs" class="default" />
+            <a href="{% url 'admin:accounts_institutionalid_changelist' %}" class="button cancel-link">Cancel</a>
+        </div>
+    </form>
+    
+    <div class="card" style="margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background: #fff3cd;">
+        <h4 style="color: #856404;">Important Notes:</h4>
+        <ul style="color: #856404;">
+            <li>Duplicate institutional IDs will be skipped</li>
+            <li>All imported IDs will have status 'active' by default</li>
+            <li>Empty rows will be ignored</li>
+            <li>Errors will be reported after import</li>
+            <li>Maximum file size: 5MB</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

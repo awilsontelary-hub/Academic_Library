@@ -1,1 +1,1 @@
-web: gunicorn online_library.wsgi --log-file -
+web: python manage.py migrate && python manage.py collectstatic --noinput && gunicorn online_library.wsgi:application --bind 0.0.0.0:$PORT

@@ -1,0 +1,500 @@
+{% extends 'library/base.html' %}
+
+{% block title %}FAQ - Online Library{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --library-primary: #1e3a8a;
+        --library-secondary: #3b82f6;
+        --library-accent: #60a5fa;
+        --library-light: #dbeafe;
+        --library-dark: #1e40af;
+        --library-success: #059669;
+        --library-warning: #d97706;
+        --library-danger: #dc2626;
+    }
+
+    .faq-hero {
+        background: linear-gradient(135deg, var(--library-primary) 0%, var(--library-secondary) 100%);
+        padding: 4rem 0 2rem;
+        color: white;
+        text-align: center;
+    }
+
+    .faq-title {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .faq-subtitle {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        margin-bottom: 2rem;
+    }
+
+    .faq-container {
+        padding: 4rem 0;
+        background: #f8fafc;
+    }
+
+    .faq-section {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(30, 58, 138, 0.1);
+        margin-bottom: 2rem;
+        overflow: hidden;
+    }
+
+    .faq-section-header {
+        background: linear-gradient(135deg, var(--library-light), #f0f9ff);
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .faq-section-title {
+        color: var(--library-primary);
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .faq-content {
+        padding: 2rem;
+    }
+
+    .faq-item {
+        border-bottom: 1px solid #e2e8f0;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+    }
+
+    .faq-item:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .faq-question {
+        color: var(--library-primary);
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .faq-answer {
+        color: #4b5563;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    .faq-answer ul {
+        margin: 0.5rem 0;
+        padding-left: 1.5rem;
+    }
+
+    .faq-answer li {
+        margin-bottom: 0.25rem;
+    }
+
+    .faq-answer code {
+        background: #e5e7eb;
+        padding: 0.2rem 0.4rem;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        color: var(--library-primary);
+    }
+
+    .contact-section {
+        background: var(--library-gradient);
+        color: white;
+        padding: 3rem 0;
+        text-align: center;
+    }
+
+    .contact-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .contact-subtitle {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin-bottom: 2rem;
+    }
+
+    .contact-info {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .contact-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1.1rem;
+    }
+
+    @media (max-width: 768px) {
+        .faq-title {
+            font-size: 2.5rem;
+        }
+        
+        .faq-content {
+            padding: 1.5rem;
+        }
+        
+        .contact-info {
+            flex-direction: column;
+            gap: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="faq-hero">
+    <div class="container">
+        <h1 class="faq-title">
+            <i class="fas fa-question-circle me-3"></i>
+            Frequently Asked Questions
+        </h1>
+        <p class="faq-subtitle">
+            Find answers to common questions about using our library system
+        </p>
+    </div>
+</section>
+
+<!-- FAQ Content -->
+<section class="faq-container">
+    <div class="container">
+        <!-- Getting Started -->
+        <div class="faq-section">
+            <div class="faq-section-header">
+                <h2 class="faq-section-title">
+                    <i class="fas fa-play-circle"></i>
+                    Getting Started
+                </h2>
+            </div>
+            <div class="faq-content">
+                <div class="faq-item">
+                    <h3 class="faq-question">
+                        <i class="fas fa-question-circle text-primary"></i>
+                        How do I create an account?
+                    </h3>
+                    <p class="faq-answer">
+                        Click on the "Join Now" or "Create an account" button on the homepage or login page. 
+                        Fill out the registration form with your details and select whether you're a Student or Staff member. 
+                        After submitting, you'll be able to log in immediately.
+                    </p>
+                </div>
+
+                <div class="faq-item">
+                    <h3 class="faq-question">
+                        <i class="fas fa-question-circle text-primary"></i>
+                        What's the difference between Student and Staff accounts?
+                    </h3>
+                    <p class="faq-answer">
+                        <strong>Student accounts</strong> can browse books, borrow them, add reviews, and manage their borrowed books.
+                        <strong>Staff accounts</strong> have additional privileges including uploading new books, managing all borrows, 
+                        viewing detailed statistics, and accessing administrative features.
+                    </p>
+                </div>
+
+                <div class="faq-item">
+                    <h3 class="faq-question">
+                        <i class="fas fa-question-circle text-primary"></i>
+                        I forgot my password. How can I reset it?
+                    </h3>
+                    <p class="faq-answer">
+                        Currently, password resets must be handled by the library administrator. 
+                        Please contact the library staff for assistance with password recovery.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Browsing and Searching Books -->
+        <div class="faq-section">
+            <div class="faq-section-header">
+                <h2 class="faq-section-title">
+                    <i class="fas fa-search"></i>
+                    Browsing and Searching Books
+                </h2>
+            </div>
+            <div class="faq-content">
+                <div class="faq-item">
+                    <h3 class="faq-question">
+                        <i class="fas fa-question-circle text-primary"></i>
+                        How do I find books in the library?
+                    </h3>
+                    <p class="faq-answer">
+                        You can browse books by clicking "Browse Books" on the homepage or navigation menu. 
+                        Use the search functionality to find books by title, author, or category. 
+                        You can also filter books by category using the dropdown filters.
+                    </p>
+                </div>
+
+                <div class="faq-item">
+                    <h3 class="faq-question">
+                        <i class="fas fa-question-circle text-primary"></i>
+                        What information is available for each book?
+                    </h3>
+                    <p class="faq-answer">
+                        Each book page displays:
+                        <ul>
+                            <li>Title, author, and category</li>
+                            <li>Detailed description</li>
+                            <li>Availability status</li>
+                            <li>Reviews and ratings from other users</li>
+                            <li>Download and preview options (if available)</li>
+                        </ul>
+                    </p>
+                </div>
+
+                <div class="faq-item">
+                    <h3 class="faq-question">
+                        <i class="fas fa-question-circle text-primary"></i>
+                        Can I preview books before borrowing them?
+                    </h3>
+                    <p class="faq-answer">
+                        Yes! Many books offer preview functionality. Look for the "Preview" button on the book detail page 
+                        to get a sample of the content before deciding to borrow.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Borrowing Books -->
+        <div class="faq-section">
+            <div class="faq-section-header">
+                <h2 class="faq-section-title">
+                    <i class="fas fa-book"></i>
+                    Borrowing Books
+                </h2>
+            </div>
+            <div class="faq-content">
+                <div class="faq-item">
+                    <h3 class="faq-question">
+                        <i class="fas fa-question-circle text-primary"></i>
+                        How do I borrow a book?
+                    </h3>
+                    <p class="faq-answer">
+                        Navigate to the book you want to borrow and click the "Borrow Book" button. 
+                        Your borrow request will be submitted for approval by library staff. 
+                        You'll be notified once your request is approved or if additional information is needed.
+                    </p>
+                </div>
+
+                <div class="faq-item">
+                    <h3 class="faq-question">
+                        <i class="fas fa-question-circle text-primary"></i>
+                        How long can I keep a borrowed book?
+                    </h3>
+                    <p class="faq-answer">
+                        The standard borrowing period is typically 2 weeks, but this may vary depending on the book type 
+                        and library policies. Check your dashboard for specific due dates for your borrowed books.
+                    </p>
+                </div>
+
+                <div class="faq-item">
+                    <h3 class="faq-question">
+                        <i class="fas fa-question-circle text-primary"></i>
+                        How do I return a book?
+                    </h3>
+                    <p class="faq-answer">
+                        Go to your student dashboard where you'll see all your currently borrowed books. 
+                        Click the "Return" button next to the book you want to return. 
+                        The return will be processed automatically.
+                    </p>
+                </div>
+
+                <div class="faq-item">
+                    <h3 class="faq-question">
+                        <i class="fas fa-question-circle text-primary"></i>
+                        Can I download books to read offline?
+                    </h3>
+                    <p class="faq-answer">
+                        Yes, for books you have successfully borrowed, you'll see a "Download" option that allows you 
+                        to save the book file to your device for offline reading.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Account Management -->
+        <div class="faq-section">
+            <div class="faq-section-header">
+                <h2 class="faq-section-title">
+                    <i class="fas fa-user-cog"></i>
+                    Account Management
+                </h2>
+            </div>
+            <div class="faq-content">
+                <div class="faq-item">
+                    <h3 class="faq-question">
+                        <i class="fas fa-question-circle text-primary"></i>
+                        How do I update my profile information?
+                    </h3>
+                    <p class="faq-answer">
+                        Click on your username in the top navigation bar and select "Profile" or "Update Profile". 
+                        You can modify your first name, last name, and email address. 
+                        Note that usernames cannot be changed after account creation.
+                    </p>
+                </div>
+
+                <div class="faq-item">
+                    <h3 class="faq-question">
+                        <i class="fas fa-question-circle text-primary"></i>
+                        Where can I see my borrowing history?
+                    </h3>
+                    <p class="faq-answer">
+                        Your complete borrowing history is available on your dashboard. 
+                        Students can access this through the "Student Dashboard" and staff through the "Teacher Dashboard". 
+                        This shows current borrows, past returns, and pending requests.
+                    </p>
+                </div>
+
+                <div class="faq-item">
+                    <h3 class="faq-question">
+                        <i class="fas fa-question-circle text-primary"></i>
+                        How do I add reviews for books I've read?
+                    </h3>
+                    <p class="faq-answer">
+                        After borrowing and reading a book, visit the book's detail page and look for the "Add Review" button. 
+                        You can rate the book and write a detailed review to help other users discover great content.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- For Staff Members -->
+        <div class="faq-section">
+            <div class="faq-section-header">
+                <h2 class="faq-section-title">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    For Staff Members
+                </h2>
+            </div>
+            <div class="faq-content">
+                <div class="faq-item">
+                    <h3 class="faq-question">
+                        <i class="fas fa-question-circle text-primary"></i>
+                        How do I add new books to the library?
+                    </h3>
+                    <p class="faq-answer">
+                        Staff members can upload new books through the "Upload Book" option in the Teacher Dashboard. 
+                        Fill out the book details including title, author, category, description, and upload the book file. 
+                        The book will be immediately available for students to browse and borrow.
+                    </p>
+                </div>
+
+                <div class="faq-item">
+                    <h3 class="faq-question">
+                        <i class="fas fa-question-circle text-primary"></i>
+                        How do I manage student borrow requests?
+                    </h3>
+                    <p class="faq-answer">
+                        Use the "Manage Borrows" section in your Teacher Dashboard to see all pending borrow requests. 
+                        You can approve or reject requests, and view the complete borrowing activity across the library.
+                    </p>
+                </div>
+
+                <div class="faq-item">
+                    <h3 class="faq-question">
+                        <i class="fas fa-question-circle text-primary"></i>
+                        Where can I view library statistics?
+                    </h3>
+                    <p class="faq-answer">
+                        The "Statistics" section provides comprehensive analytics including total books, active users, 
+                        download counts, popular books, and borrowing trends. This helps in making informed decisions 
+                        about library management and collection development.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Technical Issues -->
+        <div class="faq-section">
+            <div class="faq-section-header">
+                <h2 class="faq-section-title">
+                    <i class="fas fa-tools"></i>
+                    Technical Issues
+                </h2>
+            </div>
+            <div class="faq-content">
+                <div class="faq-item">
+                    <h3 class="faq-question">
+                        <i class="fas fa-question-circle text-primary"></i>
+                        I'm having trouble downloading a book. What should I do?
+                    </h3>
+                    <p class="faq-answer">
+                        Ensure you have successfully borrowed the book first. Check your internet connection and try again. 
+                        Some browsers may block downloads, so check your browser's download settings. 
+                        If the problem persists, contact library staff for assistance.
+                    </p>
+                </div>
+
+                <div class="faq-item">
+                    <h3 class="faq-question">
+                        <i class="fas fa-question-circle text-primary"></i>
+                        The website isn't loading properly. What can I do?
+                    </h3>
+                    <p class="faq-answer">
+                        Try refreshing the page or clearing your browser cache. Ensure you're using a modern, updated browser. 
+                        If you continue experiencing issues, try accessing the site from a different device or network. 
+                        Contact technical support if problems persist.
+                    </p>
+                </div>
+
+                <div class="faq-item">
+                    <h3 class="faq-question">
+                        <i class="fas fa-question-circle text-primary"></i>
+                        Which file formats are supported for books?
+                    </h3>
+                    <p class="faq-answer">
+                        The library supports various formats including PDF, EPUB, DOCX, and other common document formats. 
+                        For best compatibility, PDF files are recommended for most academic materials.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section class="contact-section">
+    <div class="container">
+        <h2 class="contact-title">Still Need Help?</h2>
+        <p class="contact-subtitle">
+            If you couldn't find the answer to your question, don't hesitate to reach out to our library staff
+        </p>
+        <div class="contact-info">
+            <div class="contact-item">
+                <i class="fas fa-envelope"></i>
+                <span>library@yourschool.edu</span>
+            </div>
+            <div class="contact-item">
+                <i class="fas fa-phone"></i>
+                <span>+1 (555) 123-4567</span>
+            </div>
+            <div class="contact-item">
+                <i class="fas fa-clock"></i>
+                <span>Mon-Fri: 8AM-6PM</span>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

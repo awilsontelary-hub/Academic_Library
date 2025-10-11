@@ -596,18 +596,22 @@
                             <td>{{ borrow.due_date|date:"M d, Y" }}</td>
                             <td>
                                 <div class="d-flex gap-2">
-                                    <a href="{% url 'library:approve_borrow' borrow.id %}" 
-                                       class="btn-teacher-approve"
-                                       onclick="return confirm('Approve this borrow request?')">
-                                        <i class="fas fa-check"></i>
-                                        Approve
-                                    </a>
-                                    <a href="{% url 'library:reject_borrow' borrow.id %}" 
-                                       class="btn-teacher-reject"
-                                       onclick="return confirm('Reject this borrow request?')">
-                                        <i class="fas fa-times"></i>
-                                        Reject
-                                    </a>
+                                    <form method="post" action="{% url 'library:approve_borrow' borrow.id %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn-teacher-approve"
+                                                onclick="return confirm('Approve this borrow request?')">
+                                            <i class="fas fa-check"></i>
+                                            Approve
+                                        </button>
+                                    </form>
+                                    <form method="post" action="{% url 'library:reject_borrow' borrow.id %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn-teacher-reject"
+                                                onclick="return confirm('Reject this borrow request?')">
+                                            <i class="fas fa-times"></i>
+                                            Reject
+                                        </button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>

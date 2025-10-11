@@ -369,26 +369,40 @@ def manage_borrows(request):
 @require_POST
 def approve_borrow(request, borrow_id):
     """Approve a borrow request"""
-    borrow = get_object_or_404(BookBorrow, id=borrow_id)
-    borrow.status = 'approved'
-    borrow.approved_by = request.user
-    borrow.save()
-    
-    messages.success(request, 'Borrow request approved!')
-    return redirect('library:manage_borrows')
+    try:
+        borrow = get_object_or_404(BookBorrow, id=borrow_id)
+        borrow.status = 'approved'
+        borrow.approved_by = request.user
+        borrow.save()
+        
+        messages.success(request, f'Borrow request for "{borrow.book.title}" has been approved!')
+        
+        # Always redirect to teacher dashboard for now to test
+        return redirect('library:teacher_dashboard')
+        
+    except Exception as e:
+        messages.error(request, f'Error approving borrow request: {str(e)}')
+        return redirect('library:teacher_dashboard')
 
 @login_required
 @teacher_required
 @require_POST
 def reject_borrow(request, borrow_id):
     """Reject a borrow request"""
-    borrow = get_object_or_404(BookBorrow, id=borrow_id)
-    borrow.status = 'rejected'
-    borrow.approved_by = request.user
-    borrow.save()
-    
-    messages.success(request, 'Borrow request rejected!')
-    return redirect('library:manage_borrows')
+    try:
+        borrow = get_object_or_404(BookBorrow, id=borrow_id)
+        borrow.status = 'rejected'
+        borrow.approved_by = request.user
+        borrow.save()
+        
+        messages.success(request, f'Borrow request for "{borrow.book.title}" has been rejected!')
+        
+        # Always redirect to teacher dashboard for now to test
+        return redirect('library:teacher_dashboard')
+        
+    except Exception as e:
+        messages.error(request, f'Error rejecting borrow request: {str(e)}')
+        return redirect('library:teacher_dashboard')
 
 @login_required
 @require_POST
@@ -426,3 +440,23 @@ def add_review(request, book_id):
         form = BookReviewForm()
     
     return render(request, 'library/add_review.html', {'form': form, 'book': book})
+
+def faq_view(request):
+    """FAQ page with common questions and answers"""
+    return render(request, 'library/faq.html')
+
+def about_view(request):
+    """About page with library information and features"""
+    # Get some statistics for the about page
+    total_books = BookDetails.objects.count()
+    total_users = User.objects.count()
+    total_categories = Category.objects.count()
+    total_downloads = BookDownload.objects.count()
+    
+    context = {
+        'total_books': total_books,
+        'total_users': total_users,
+        'total_categories': total_categories,
+        'total_downloads': total_downloads,
+    }
+    return render(request, 'library/about.html', context)
