@@ -2,7 +2,7 @@ Django==5.2.6
 Pillow>=10.0.0
 python-decouple>=3.8
 
-# For MySQL database support (optional - for cPanel MySQL)
+# PythonAnywhere MySQL support (optional)
 mysqlclient>=2.1.0
 
 # Development dependencies (optional)

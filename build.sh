@@ -17,8 +17,25 @@ python manage.py check
 echo "�️ Setting up database..."
 python manage.py setup_database
 
-# Collect static files
-echo "🎨 Collecting static files..."
+#!/usr/bin/env bash
+# Render.com Build Script for Django Academic Library
+set -o errexit
+
+echo "🔧 Starting Render build process..."
+
+# Install dependencies
+echo "📦 Installing dependencies..."
+pip install --upgrade pip
+pip install -r requirements.txt
+
+# Run Django management commands
+echo "🗄️ Running database migrations..."
+python manage.py migrate
+
+echo "📁 Collecting static files..."
 python manage.py collectstatic --noinput
 
-echo "🎉 Build completed successfully!"
+echo "👤 Setting up initial data..."
+python cpanel_setup.py || echo "Setup script completed with warnings"
+
+echo "✅ Build completed successfully!"

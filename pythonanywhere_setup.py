@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 """
-Quick setup script for cPanel deployment of Academic Library Django app
-Run this after uploading to your cPanel hosting
+PythonAnywhere setup script for Academic Library Django app
+Run this after uploading to your PythonAnywhere account
 """
 
 import os
 import sys
 import django
 
-def setup_cpanel_deployment():
-    """Setup Django application for cPanel hosting"""
+def setup_pythonanywhere():
+    """Setup Django application for PythonAnywhere hosting"""
     
-    print("🚀 Setting up Academic Library for cPanel deployment...")
+    print("🐍 Setting up Academic Library for PythonAnywhere...")
     
     # Set Django settings
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'online_library.settings')
@@ -88,15 +88,14 @@ def setup_cpanel_deployment():
         else:
             print(f"ℹ️  Institutional ID already exists: {id_data['institutional_id']}")
     
-    print("\n🎉 cPanel deployment setup complete!")
+    print("\n🎉 PythonAnywhere setup complete!")
     print("\n📋 Next steps:")
     print("1. Create admin user: python manage.py createsuperuser")
-    print("2. Configure your domain in cPanel Python App")
-    print("3. Update passenger_wsgi.py with correct paths")
-    print("4. Set up .env file with your domain and secret key")
-    print("5. Restart your Python application in cPanel")
-    print("\n🔗 Access your site at: https://yourdomain.com")
-    print("🔐 Admin panel: https://yourdomain.com/admin")
+    print("2. Configure your domain in PythonAnywhere Web tab")
+    print("3. Set up .env file with your domain and database details")
+    print("4. Reload your web app in PythonAnywhere")
+    print("\n🔗 Access your site at: https://yourusername.pythonanywhere.com")
+    print("🔐 Admin panel: https://yourusername.pythonanywhere.com/admin")
 
 if __name__ == "__main__":
-    setup_cpanel_deployment()
+    setup_pythonanywhere()

@@ -19,7 +19,7 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-10uh7x8*%v4%7u0cg2369
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost', cast=lambda v: [s.strip() for s in v.split(',')])
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost,*.pythonanywhere.com', cast=lambda v: [s.strip() for s in v.split(',')])
 
 # Application definition
 
@@ -71,19 +71,20 @@ WSGI_APPLICATION = 'online_library.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# For cPanel hosting, you can use MySQL or SQLite
-# MySQL configuration for cPanel (recommended for production)
+# PythonAnywhere database configuration
 if config('USE_MYSQL', default=False, cast=bool):
+    # MySQL configuration for PythonAnywhere
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': config('DB_NAME'),
-            'USER': config('DB_USER'),
+            'NAME': config('DB_NAME'),  # Usually 'yourusername$databasename'
+            'USER': config('DB_USER'),  # Usually your PythonAnywhere username
             'PASSWORD': config('DB_PASSWORD'),
-            'HOST': config('DB_HOST', default='localhost'),
+            'HOST': config('DB_HOST'),  # Usually 'yourusername.mysql.pythonanywhere-services.com'
             'PORT': config('DB_PORT', default='3306'),
             'OPTIONS': {
                 'sql_mode': 'STRICT_TRANS_TABLES',
+                'charset': 'utf8mb4',
             }
         }
     }
@@ -141,9 +142,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
-
-# Static files configuration for cPanel hosting
-# cPanel will handle static file serving automatically
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
