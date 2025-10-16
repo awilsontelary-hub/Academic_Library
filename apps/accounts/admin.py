@@ -3,13 +3,13 @@ from django.contrib.auth.admin import UserAdmin
 from .models import User
 
 # Change the header (top of admin page)
-admin.site.site_header = "Academic Library"
+admin.site.site_header = "AcademiaLink"
 
 # Change the title (browser tab)
-admin.site.site_title = "Academic Library"
+admin.site.site_title = "AcademiaLink"
 
 # Change the index page title
-admin.site.index_title = "Welcome to Academic Library"
+admin.site.index_title = "Welcome to AcademiaLink Digital Library"
 
 
 from django.contrib import admin
