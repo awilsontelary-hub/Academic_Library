@@ -19,7 +19,12 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-10uh7x8*%v4%7u0cg2369
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost,*.pythonanywhere.com', cast=lambda v: [s.strip() for s in v.split(',')])
+# Allow local dev by default and common PaaS domains (adjust via env)
+ALLOWED_HOSTS = config(
+    'ALLOWED_HOSTS',
+    default='127.0.0.1,localhost,*.pythonanywhere.com,*.onrender.com',
+    cast=lambda v: [s.strip() for s in v.split(',')]
+)
 
 # Application definition
 
@@ -40,6 +45,7 @@ AUTH_USER_MODEL = 'accounts.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    # Enable WhiteNoise in production when available/desired
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -90,10 +96,12 @@ if config('USE_MYSQL', default=False, cast=bool):
     }
 else:
     # SQLite for development and simple deployments
+    # Support mounting a persistent disk on platforms like Render via DATA_DIR
+    DATA_DIR = Path(config('DATA_DIR', default=str(BASE_DIR)))
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+            'NAME': DATA_DIR / 'db.sqlite3',
         }
     }
 
@@ -136,7 +144,8 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# Place media on DATA_DIR when provided (persistent disk in PaaS)
+MEDIA_ROOT = os.path.join(config('DATA_DIR', default=str(BASE_DIR)), 'media')
 
 # Additional static files directories
 STATICFILES_DIRS = [
@@ -166,3 +175,9 @@ ALLOWED_FILE_EXTENSIONS = ['.pdf', '.doc', '.docx', '.txt', '.jpg', '.jpeg', '.p
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+
+# Optional WhiteNoise static files support (set USE_WHITENOISE=true in env)
+if config('USE_WHITENOISE', default=False, cast=bool):
+    # Insert WhiteNoise after SecurityMiddleware
+    MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

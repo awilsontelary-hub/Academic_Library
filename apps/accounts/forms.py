@@ -156,13 +156,17 @@ class CustomUserCreationForm(UserCreationForm):
             if id_record.academic_level:
                 user.academic_level = id_record.academic_level
         
+        # Set user as inactive until admin approval
+        user.is_active = False
+        
         if commit:
+            # Save user first without institutional_id to avoid constraint issues
             user.save()
             
-            # Link user to institutional ID and mark it as used
+            # Now link user to institutional ID and mark it as used
             if hasattr(self, 'institutional_id_record'):
                 user.institutional_id = self.institutional_id_record
-                user.save()
+                user.save(update_fields=['institutional_id'])
                 self.institutional_id_record.mark_as_used(user)
         
         return user

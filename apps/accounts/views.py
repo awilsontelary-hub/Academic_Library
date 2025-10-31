@@ -23,13 +23,13 @@ def register_view(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)
-            messages.success(request, 'Account created successfully!')
-            if user.staff:
-                return redirect('library:teacher_dashboard')
-            elif user.student:
-                return redirect('library:student_dashboard')
-            return redirect('library:home')
+            # Don't auto-login inactive users - they need admin approval
+            messages.success(
+                request, 
+                'Registration successful! Your account is pending approval. '
+                'You will be able to login once an administrator approves your account.'
+            )
+            return redirect('accounts:login')
     else:
         form = CustomUserCreationForm()
     
