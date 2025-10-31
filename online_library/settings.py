@@ -5,6 +5,7 @@ Django settings for online_library project.
 from pathlib import Path
 import os
 from decouple import config
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -77,8 +78,19 @@ WSGI_APPLICATION = 'online_library.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# PythonAnywhere database configuration
-if config('USE_MYSQL', default=False, cast=bool):
+# If DATABASE_URL is provided (e.g., Render PostgreSQL), use it first
+database_url = config('DATABASE_URL', default='')
+if database_url:
+    DATABASES = {
+        'default': dj_database_url.parse(
+            database_url,
+            conn_max_age=600,
+            ssl_require=True
+        )
+    }
+
+# Else, support MySQL (legacy PythonAnywhere option)
+elif config('USE_MYSQL', default=False, cast=bool):
     # MySQL configuration for PythonAnywhere
     DATABASES = {
         'default': {

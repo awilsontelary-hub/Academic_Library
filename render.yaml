@@ -20,6 +20,9 @@ services:
         value: "127.0.0.1,localhost,*.onrender.com"
       - key: DATA_DIR
         value: /var/data
+      # DATABASE_URL will be provided by Render Postgres; set as secret in dashboard
+      - key: DATABASE_URL
+        sync: false
       # Add SECRET_KEY in Render dashboard as a secret
       - key: SECRET_KEY
         sync: false
