@@ -8,8 +8,7 @@ services:
     buildCommand: |
       pip install -r requirements.txt
       python manage.py collectstatic --noinput
-    startCommand: gunicorn online_library.wsgi:application
-    postDeploy: python manage.py migrate --noinput
+  startCommand: bash -lc "python manage.py migrate --noinput && gunicorn online_library.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120"
     autoDeploy: true
     envVars:
       - key: DEBUG
