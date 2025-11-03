@@ -23,7 +23,8 @@ DEBUG = config('DEBUG', default=True, cast=bool)
 # Allow local dev by default and common PaaS domains (adjust via env)
 ALLOWED_HOSTS = config(
     'ALLOWED_HOSTS',
-    default='127.0.0.1,localhost,*.pythonanywhere.com,*.onrender.com',
+    # Use leading dot for subdomain wildcard per Django docs
+    default='127.0.0.1,localhost,.pythonanywhere.com,.onrender.com',
     cast=lambda v: [s.strip() for s in v.split(',')]
 )
 

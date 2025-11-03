@@ -17,7 +17,7 @@ services:
       - key: USE_WHITENOISE
         value: True
       - key: ALLOWED_HOSTS
-        value: "127.0.0.1,localhost,*.onrender.com"
+        value: "127.0.0.1,localhost,.onrender.com,academic-library.onrender.com"
       - key: DATA_DIR
         value: /var/data
       # DATABASE_URL will be provided by Render Postgres; set as secret in dashboard
