@@ -8,7 +8,7 @@ services:
     buildCommand: |
       pip install -r requirements.txt
       python manage.py collectstatic --noinput
-  startCommand: bash -lc "python manage.py migrate --noinput && gunicorn online_library.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120"
+    startCommand: bash -lc "python manage.py migrate --noinput && gunicorn online_library.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120"
     autoDeploy: true
     envVars:
       - key: DEBUG
@@ -19,26 +19,18 @@ services:
         value: "127.0.0.1,localhost,.onrender.com,academic-library.onrender.com"
       - key: DATA_DIR
         value: /var/data
-      # DATABASE_URL will be provided by Render Postgres; set as secret in dashboard
       - key: DATABASE_URL
         sync: false
-      # Add SECRET_KEY in Render dashboard as a secret
       - key: SECRET_KEY
         sync: false
-      # Optional email settings (set in dashboard if used)
       - key: EMAIL_HOST
         value: smtp.gmail.com
       - key: EMAIL_PORT
         value: 587
       - key: EMAIL_USE_TLS
         value: True
-    # Attach a persistent disk to keep SQLite DB and uploaded media
-    disk:
-      name: data
-      mountPath: /var/data
-      sizeGB: 1
-  # DATA_DIR tells Django to store db.sqlite3 and media on the mounted disk
-    #     value: /var/data
-
-    # But some UIs prefer setting env vars in dashboard. We'll add it here too.
+    disks:
+      - name: data
+        mountPath: /var/data
+        sizeGB: 1
 
