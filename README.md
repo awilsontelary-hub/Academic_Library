@@ -141,7 +141,7 @@ heroku run python manage.py migrate
 heroku run python manage.py createsuperuser
 ```
 
-## 📁 Project Structure
+## 📁 Project File Structure
 
 ```
 Academic_Library-main/
@@ -248,7 +248,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 📧 Support
 
-For support and questions, please contact [your-email@domain.com]
+For support and questions, please contact [a.wilsontelary@domain.com]
 
 ## 🙏 Acknowledgments
 
@@ -259,4 +259,4 @@ For support and questions, please contact [your-email@domain.com]
 
 ---
 
-**AcademiaLink Library Management System** - Empowering educational institutions with modern library management solutions.
+**Academic Library Management System** - Empowering educational institutions with modern library management solutions.

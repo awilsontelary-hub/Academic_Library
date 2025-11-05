@@ -200,14 +200,6 @@ class BookListView(ListView):
         return queryset
 ```
 
-**Features Implemented:**
-- Book listing with pagination
-- Search functionality (title, author, ISBN)
-- Category filtering
-- Book upload for staff members
-- Cover image handling
-- File download system
-
 #### **4.2 Borrowing System**
 ```python
 class BorrowBookView(LoginRequiredMixin, CreateView):
@@ -224,7 +216,6 @@ class BorrowBookView(LoginRequiredMixin, CreateView):
         form.instance.due_date = timezone.now() + timedelta(days=14)
         return super().form_valid(form)
 ```
-
 **Borrowing Features:**
 - Book availability checking
 - Automatic due date calculation
@@ -233,7 +224,6 @@ class BorrowBookView(LoginRequiredMixin, CreateView):
 - Overdue notifications
 
 ### **Phase 5: Admin Interface**
-
 #### **5.1 Custom Admin Configuration**
 ```python
 # apps/accounts/admin.py
@@ -246,16 +236,6 @@ class UserAdmin(admin.ModelAdmin):
     def approve_users(self, request, queryset):
         """Bulk approve selected users"""
         queryset.update(is_approved=True)
-```
-
-**Admin Features:**
-- User approval workflow
-- Institutional ID management
-- Bulk operations
-- Book management
-- Borrowing records oversight
-- Category management
-
 #### **5.2 Dashboard & Analytics**
 ```python
 def admin_dashboard(request):

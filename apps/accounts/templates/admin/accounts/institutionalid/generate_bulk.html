@@ -1,0 +1,100 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 40px auto; padding: 20px;">
+    <h1 style="margin-bottom: 30px;">{{ title }}</h1>
+    
+    <form method="post" style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        {% csrf_token %}
+        
+        <div style="margin-bottom: 20px;">
+            <label for="count" style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">
+                Number of IDs to Generate:
+            </label>
+            <input 
+                type="number" 
+                id="count" 
+                name="count" 
+                value="1" 
+                min="1" 
+                max="100" 
+                required
+                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;"
+            >
+            <small style="color: #666; display: block; margin-top: 5px;">Maximum: 100 IDs at once</small>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <label for="account_type" style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">
+                Account Type:
+            </label>
+            <select 
+                id="account_type" 
+                name="account_type" 
+                required
+                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;"
+            >
+                {% for value, label in account_types %}
+                <option value="{{ value }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <label for="academic_level" style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">
+                Academic Level (Optional):
+            </label>
+            <select 
+                id="academic_level" 
+                name="academic_level"
+                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;"
+            >
+                <option value="">-- Not specified --</option>
+                {% for value, label in academic_levels %}
+                <option value="{{ value }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <label for="department" style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">
+                Department (Optional):
+            </label>
+            <input 
+                type="text" 
+                id="department" 
+                name="department" 
+                placeholder="e.g., Computer Science, Engineering"
+                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;"
+            >
+        </div>
+        
+        <div style="margin-top: 30px; display: flex; gap: 10px;">
+            <button 
+                type="submit"
+                style="flex: 1; padding: 12px 24px; background: #417690; color: white; border: none; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer;"
+            >
+                Generate IDs
+            </button>
+            <a 
+                href="{% url 'admin:accounts_institutionalid_changelist' %}"
+                style="flex: 1; padding: 12px 24px; background: #6c757d; color: white; border: none; border-radius: 4px; font-size: 16px; font-weight: bold; text-align: center; text-decoration: none; display: block;"
+            >
+                Cancel
+            </a>
+        </div>
+    </form>
+    
+    <div style="margin-top: 30px; padding: 20px; background: #e7f3ff; border-left: 4px solid #2196F3; border-radius: 4px;">
+        <h3 style="margin-top: 0; color: #1976D2;">How it works:</h3>
+        <ol style="margin: 10px 0; padding-left: 20px; line-height: 1.8;">
+            <li>Generated IDs will be automatically created with format: <code>STU-XXXXXX</code> or <code>STAFF-XXXXXX</code></li>
+            <li>Each ID is unique and ready to use immediately</li>
+            <li>Users can log in directly using their assigned institutional ID</li>
+            <li>On first login, a user account will be auto-created</li>
+            <li>View and manage all generated IDs in the main list</li>
+        </ol>
+    </div>
+</div>
+{% endblock %}

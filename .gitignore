@@ -28,7 +28,6 @@ MANIFEST
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
-migrations/
 
 # Virtual Environment
 .venv/
@@ -53,9 +52,7 @@ ehthumbs.db
 Thumbs.db
 
 # Static and Media files (for production)
-/static/
 /staticfiles/
-/media/
 
 # Environment variables
 .env
@@ -84,3 +81,11 @@ celerybeat-schedule
 
 # Cache
 .cache/
+
+# Test files (temporary)
+test_*.py
+check_*.py
+
+# Uploaded files (keep directory structure, ignore files)
+media/books/*
+!media/books/.gitkeep

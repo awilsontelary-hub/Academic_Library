@@ -1,17 +1,56 @@
+"""
+Forms for user registration, profile updates, and institutional ID management.
+"""
+import csv
+import io
+
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.core.exceptions import ValidationError
-from .models import User, InstitutionalID
+
+from .models import InstitutionalID, User
+
+
+class CustomAuthenticationForm(AuthenticationForm):
+    """
+    Custom authentication form that explicitly supports string-based usernames
+    including institutional IDs with dashes and alphanumeric characters.
+    """
+    
+    username = forms.CharField(
+        max_length=150,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Institutional ID or Username',
+            'autofocus': True
+        })
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Password'
+        })
+    )
+
 
 class CustomUserCreationForm(UserCreationForm):
+    """
+    Custom user registration form with institutional ID verification.
+    
+    Requires users to provide a valid, active institutional ID during registration.
+    Auto-fills account type and academic information from the institutional ID record.
+    """
+    
     # Institutional verification field
     institutional_id = forms.CharField(
         max_length=20,
         required=True,
-        help_text="Enter your institutional ID (Student ID or Employee ID)",
+        help_text="Enter your institutional ID (numeric, e.g., 20123456 for students, 30123456 for staff)",
         widget=forms.TextInput(attrs={
-            'placeholder': 'e.g., STU2024001 or EMP2024001',
-            'class': 'form-control'
+            'placeholder': 'e.g., 20123456 or 30123456',
+            'class': 'form-control',
+            'pattern': '[0-9]+',
+            'title': 'Institutional ID must be numeric'
         })
     )
     
@@ -21,24 +60,26 @@ class CustomUserCreationForm(UserCreationForm):
         widget=forms.EmailInput(attrs={'class': 'form-control'})
     )
     first_name = forms.CharField(
-        max_length=30, 
+        max_length=30,
         required=True,
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
     last_name = forms.CharField(
-        max_length=30, 
+        max_length=30,
         required=True,
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
     
-    # Account type fields (will be auto-filled based on institutional ID)
+    # Account type fields (auto-filled based on institutional ID)
     is_student = forms.BooleanField(required=False, initial=True)
     is_staff = forms.BooleanField(required=False, initial=False)
 
     class Meta:
         model = User
-        fields = ('institutional_id', 'username', 'email', 'first_name', 'last_name', 
-                 'is_student', 'is_staff', 'password1', 'password2')
+        fields = (
+            'institutional_id', 'username', 'email', 'first_name', 'last_name',
+            'is_student', 'is_staff', 'password1', 'password2'
+        )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -47,12 +88,17 @@ class CustomUserCreationForm(UserCreationForm):
             if field_name not in ['is_student', 'is_staff']:
                 field.widget.attrs['class'] = 'form-control'
         
-        # Make account type fields read-only since they'll be determined by institutional ID
+        # Hide account type fields since they're determined by institutional ID
         self.fields['is_student'].widget.attrs['style'] = 'display: none;'
         self.fields['is_staff'].widget.attrs['style'] = 'display: none;'
 
     def clean_institutional_id(self):
-        """Validate the institutional ID"""
+        """
+        Validate the institutional ID.
+        
+        Checks if ID exists, is available, and not expired.
+        Stores ID record for use in save method.
+        """
         institutional_id = self.cleaned_data.get('institutional_id')
         
         if not institutional_id:
@@ -97,7 +143,7 @@ class CustomUserCreationForm(UserCreationForm):
         return institutional_id
 
     def clean_email(self):
-        """Validate email and check for duplicates"""
+        """Validate email and check for duplicates."""
         email = self.cleaned_data.get('email')
         
         if User.objects.filter(email=email).exists():
@@ -106,7 +152,7 @@ class CustomUserCreationForm(UserCreationForm):
         return email
 
     def clean_username(self):
-        """Validate username"""
+        """Validate username and check for duplicates."""
         username = self.cleaned_data.get('username')
         
         if User.objects.filter(username=username).exists():
@@ -115,7 +161,12 @@ class CustomUserCreationForm(UserCreationForm):
         return username
 
     def clean(self):
-        """Final form validation"""
+        """
+        Final form validation and data pre-filling.
+        
+        Auto-sets account type based on institutional ID and pre-fills
+        personal information if available in the institutional record.
+        """
         cleaned_data = super().clean()
         
         # Auto-set account type based on institutional ID
@@ -142,7 +193,13 @@ class CustomUserCreationForm(UserCreationForm):
         return cleaned_data
 
     def save(self, commit=True):
-        """Save the user and link to institutional ID"""
+        """
+        Save the user and link to institutional ID.
+        
+        Users registered with valid institutional IDs are automatically activated
+        since the ID was pre-approved by administration. The institutional ID is
+        then marked as used.
+        """
         user = super().save(commit=False)
         user.email = self.cleaned_data['email']
         user.first_name = self.cleaned_data['first_name']
@@ -156,8 +213,8 @@ class CustomUserCreationForm(UserCreationForm):
             if id_record.academic_level:
                 user.academic_level = id_record.academic_level
         
-        # Set user as inactive until admin approval
-        user.is_active = False
+        # Activate user immediately since institutional ID was pre-approved
+        user.is_active = True
         
         if commit:
             # Save user first without institutional_id to avoid constraint issues
@@ -171,34 +228,51 @@ class CustomUserCreationForm(UserCreationForm):
         
         return user
 
+
 class UserUpdateForm(forms.ModelForm):
+    """Simple form for users to update their profile information."""
+    
     class Meta:
         model = User
         fields = ('first_name', 'last_name', 'email')
 
+
 class InstitutionalIDForm(forms.ModelForm):
-    """Form for administrators to add/edit institutional IDs"""
+    """Form for administrators to add/edit institutional IDs."""
     
     class Meta:
         model = InstitutionalID
-        fields = ('institutional_id', 'account_type', 'first_name', 'last_name', 
-                 'email', 'academic_level', 'department', 'expires_at', 'notes')
+        fields = (
+            'institutional_id', 'account_type', 'first_name', 'last_name',
+            'email', 'academic_level', 'department', 'expires_at', 'notes'
+        )
         widgets = {
             'expires_at': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'notes': forms.Textarea(attrs={'rows': 3}),
         }
 
+
 class BulkInstitutionalIDForm(forms.Form):
-    """Form for bulk importing institutional IDs via CSV"""
+    """
+    Form for bulk importing institutional IDs via CSV.
+    
+    Expected CSV columns: institutional_id, account_type, first_name,
+    last_name, email, academic_level, department
+    """
     
     csv_file = forms.FileField(
-        help_text="Upload a CSV file with columns: institutional_id, account_type, first_name, last_name, email, academic_level, department"
+        help_text=(
+            "Upload a CSV file with columns: institutional_id, account_type, "
+            "first_name, last_name, email, academic_level, department"
+        )
     )
     
     def clean_csv_file(self):
+        """Validate that uploaded file is a CSV."""
         file = self.cleaned_data.get('csv_file')
         
         if not file.name.endswith('.csv'):
             raise ValidationError("Please upload a CSV file.")
         
         return file
+

@@ -52,30 +52,20 @@
                                     </td>
                                     <td>
                                         {% if borrow.status == 'pending' %}
-                                            <form method="post" action="{% url 'library:approve_borrow' borrow.id %}" class="d-inline approve-form">
+                                            <form method="post" action="{% url 'library:approve_borrow' borrow.id %}" class="d-inline">
                                                 {% csrf_token %}
-                                                <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Are you sure you want to approve this borrow request for {{ borrow.book.title }}?')">
+                                                <button type="submit" class="btn btn-sm btn-success">
                                                     <i class="fas fa-check"></i> Approve
                                                 </button>
                                             </form>
-                                            <form method="post" action="{% url 'library:reject_borrow' borrow.id %}" class="d-inline reject-form">
+                                            <form method="post" action="{% url 'library:reject_borrow' borrow.id %}" class="d-inline">
                                                 {% csrf_token %}
-                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to reject this borrow request for {{ borrow.book.title }}?')">
+                                                <button type="submit" class="btn btn-sm btn-danger">
                                                     <i class="fas fa-times"></i> Reject
                                                 </button>
                                             </form>
-                                        {% elif borrow.status == 'approved' %}
-                                            <span class="text-success">
-                                                <i class="fas fa-check-circle"></i>
-                                                Approved by {{ borrow.approved_by.get_full_name|default:borrow.approved_by.username }}
-                                            </span>
-                                        {% elif borrow.status == 'rejected' %}
-                                            <span class="text-danger">
-                                                <i class="fas fa-times-circle"></i>
-                                                Rejected by {{ borrow.approved_by.get_full_name|default:borrow.approved_by.username }}
-                                            </span>
                                         {% endif %}
-                                        <a href="{% url 'library:book_detail' borrow.book.id %}" class="btn btn-sm btn-outline-info ms-2">
+                                        <a href="{% url 'library:book_detail' borrow.book.id %}" class="btn btn-sm btn-outline-info">
                                             <i class="fas fa-eye"></i> View Book
                                         </a>
                                     </td>

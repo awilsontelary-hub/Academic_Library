@@ -5,7 +5,11 @@ Django settings for online_library project.
 from pathlib import Path
 import os
 from decouple import config
-import dj_database_url
+# Optional: only needed when using DATABASE_URL (e.g., Postgres on Render)
+try:
+    import dj_database_url  # type: ignore
+except ImportError:  # pragma: no cover
+    dj_database_url = None
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -45,6 +49,12 @@ INSTALLED_APPS = [
 
 AUTH_USER_MODEL = 'accounts.User'
 
+# Authentication backends
+AUTHENTICATION_BACKENDS = [
+    'apps.accounts.backends.InstitutionalIDBackend',  # Custom institutional ID login
+    'django.contrib.auth.backends.ModelBackend',      # Default username/password
+]
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     # Enable WhiteNoise in production when available/desired
@@ -79,37 +89,14 @@ WSGI_APPLICATION = 'online_library.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# If DATABASE_URL is provided (e.g., Render PostgreSQL), use it first
-database_url = config('DATABASE_URL', default='')
-if database_url:
-    DATABASES = {
-        'default': dj_database_url.parse(
-            database_url,
-            conn_max_age=600,
-            ssl_require=True
-        )
-    }
+# Database selection order (top to bottom):
+# 1) Force SQLite when USE_SQLITE=true (offline mode)
+# 2) DATABASE_URL (Postgres on Render)
+# 3) USE_MYSQL legacy option
+# 4) SQLite fallback
 
-# Else, support MySQL (legacy PythonAnywhere option)
-elif config('USE_MYSQL', default=False, cast=bool):
-    # MySQL configuration for PythonAnywhere
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': config('DB_NAME'),  # Usually 'yourusername$databasename'
-            'USER': config('DB_USER'),  # Usually your PythonAnywhere username
-            'PASSWORD': config('DB_PASSWORD'),
-            'HOST': config('DB_HOST'),  # Usually 'yourusername.mysql.pythonanywhere-services.com'
-            'PORT': config('DB_PORT', default='3306'),
-            'OPTIONS': {
-                'sql_mode': 'STRICT_TRANS_TABLES',
-                'charset': 'utf8mb4',
-            }
-        }
-    }
-else:
-    # SQLite for development and simple deployments
-    # Support mounting a persistent disk on platforms like Render via DATA_DIR
+# Force offline SQLite when requested (default True for local/offline)
+if config('USE_SQLITE', default=True, cast=bool):
     DATA_DIR = Path(config('DATA_DIR', default=str(BASE_DIR)))
     DATABASES = {
         'default': {
@@ -117,6 +104,55 @@ else:
             'NAME': DATA_DIR / 'db.sqlite3',
         }
     }
+
+# Else, use DATABASE_URL if present (e.g., Render PostgreSQL)
+else:
+    database_url = config('DATABASE_URL', default='')
+    if database_url and dj_database_url is not None:
+        DATABASES = {
+            'default': dj_database_url.parse(
+                database_url,
+                conn_max_age=600,
+                ssl_require=True
+            )
+        }
+    elif database_url and dj_database_url is None:
+        # DATABASE_URL provided but parser not installed locally; fall back to SQLite
+        DATA_DIR = Path(config('DATA_DIR', default=str(BASE_DIR)))
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': DATA_DIR / 'db.sqlite3',
+            }
+        }
+
+    # Else, support MySQL (legacy PythonAnywhere option)
+    elif config('USE_MYSQL', default=False, cast=bool):
+        # MySQL configuration for PythonAnywhere
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.mysql',
+                'NAME': config('DB_NAME'),  # Usually 'yourusername$databasename'
+                'USER': config('DB_USER'),  # Usually your PythonAnywhere username
+                'PASSWORD': config('DB_PASSWORD'),
+                'HOST': config('DB_HOST'),  # Usually 'yourusername.mysql.pythonanywhere-services.com'
+                'PORT': config('DB_PORT', default='3306'),
+                'OPTIONS': {
+                    'sql_mode': 'STRICT_TRANS_TABLES',
+                    'charset': 'utf8mb4',
+                }
+            }
+        }
+    else:
+        # SQLite for development and simple deployments
+        # Support mounting a persistent disk on platforms like Render via DATA_DIR
+        DATA_DIR = Path(config('DATA_DIR', default=str(BASE_DIR)))
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': DATA_DIR / 'db.sqlite3',
+            }
+        }
 
 
 # Password validation
