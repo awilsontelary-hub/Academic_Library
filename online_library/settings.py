@@ -5,35 +5,27 @@ Django settings for online_library project.
 from pathlib import Path
 import os
 from decouple import config
-# Optional: only needed when using DATABASE_URL (e.g., Postgres on Render)
-try:
-    import dj_database_url  # type: ignore
-except ImportError:  # pragma: no cover
-    dj_database_url = None
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# Optional dependency for DATABASE_URL parsing (Postgres on Render)
+import dj_database_url
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
+# -----------------------------------------------------------------------------
+# Security and Debug
+# -----------------------------------------------------------------------------
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-10uh7x8*%v4%7u0cg2369a7*_^3dlvshvn#psk&o4td8h9csnr')
-
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-# Allow local dev by default and common PaaS domains (adjust via env)
 ALLOWED_HOSTS = config(
     'ALLOWED_HOSTS',
-    # Use leading dot for subdomain wildcard per Django docs
-    default='127.0.0.1,localhost,.pythonanywhere.com,.onrender.com',
+    default='127.0.0.1,localhost,.onrender.com',
     cast=lambda v: [s.strip() for s in v.split(',')]
 )
 
-# Application definition
-
+# -----------------------------------------------------------------------------
+# Installed Apps & Middleware
+# -----------------------------------------------------------------------------
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -42,22 +34,20 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # my apps
+    # My apps
     'apps.accounts',
     'apps.library',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
 
-# Authentication backends
 AUTHENTICATION_BACKENDS = [
-    'apps.accounts.backends.InstitutionalIDBackend',  # Custom institutional ID login
-    'django.contrib.auth.backends.ModelBackend',      # Default username/password
+    'apps.accounts.backends.InstitutionalIDBackend',
+    'django.contrib.auth.backends.ModelBackend',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    # Enable WhiteNoise in production when available/desired
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -65,6 +55,11 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# Optional WhiteNoise support for static files in production
+if config('USE_WHITENOISE', default=False, cast=bool):
+    MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 ROOT_URLCONF = 'online_library.urls'
 
@@ -85,128 +80,75 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'online_library.wsgi.application'
 
+# -----------------------------------------------------------------------------
+# Database Configuration (Render-compatible)
+# -----------------------------------------------------------------------------
+# Priority:
+#   1. DATABASE_URL (Render PostgreSQL)
+#   2. SQLite fallback for local development
 
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+database_url = config('DATABASE_URL', default='')
+use_sqlite = config('USE_SQLITE', default=False, cast=bool)
 
-# Database selection order (top to bottom):
-# 1) Force SQLite when USE_SQLITE=true (offline mode)
-# 2) DATABASE_URL (Postgres on Render)
-# 3) USE_MYSQL legacy option
-# 4) SQLite fallback
-
-# Force offline SQLite when requested (default True for local/offline)
-if config('USE_SQLITE', default=True, cast=bool):
-    DATA_DIR = Path(config('DATA_DIR', default=str(BASE_DIR)))
+if database_url:
+    # Use Render Postgres
+    DATABASES = {
+        'default': dj_database_url.parse(
+            database_url,
+            conn_max_age=600,  # Persistent connection
+            ssl_require=True,  # Render requires SSL
+        )
+    }
+elif use_sqlite:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': DATA_DIR / 'db.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+else:
+    # Default fallback (SQLite)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
 
-# Else, use DATABASE_URL if present (e.g., Render PostgreSQL)
-else:
-    database_url = config('DATABASE_URL', default='')
-    if database_url and dj_database_url is not None:
-        DATABASES = {
-            'default': dj_database_url.parse(
-                database_url,
-                conn_max_age=600,
-                ssl_require=True
-            )
-        }
-    elif database_url and dj_database_url is None:
-        # DATABASE_URL provided but parser not installed locally; fall back to SQLite
-        DATA_DIR = Path(config('DATA_DIR', default=str(BASE_DIR)))
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': DATA_DIR / 'db.sqlite3',
-            }
-        }
-
-    # Else, support MySQL (legacy PythonAnywhere option)
-    elif config('USE_MYSQL', default=False, cast=bool):
-        # MySQL configuration for PythonAnywhere
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.mysql',
-                'NAME': config('DB_NAME'),  # Usually 'yourusername$databasename'
-                'USER': config('DB_USER'),  # Usually your PythonAnywhere username
-                'PASSWORD': config('DB_PASSWORD'),
-                'HOST': config('DB_HOST'),  # Usually 'yourusername.mysql.pythonanywhere-services.com'
-                'PORT': config('DB_PORT', default='3306'),
-                'OPTIONS': {
-                    'sql_mode': 'STRICT_TRANS_TABLES',
-                    'charset': 'utf8mb4',
-                }
-            }
-        }
-    else:
-        # SQLite for development and simple deployments
-        # Support mounting a persistent disk on platforms like Render via DATA_DIR
-        DATA_DIR = Path(config('DATA_DIR', default=str(BASE_DIR)))
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': DATA_DIR / 'db.sqlite3',
-            }
-        }
-
-
+# -----------------------------------------------------------------------------
 # Password validation
-# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
-
+# -----------------------------------------------------------------------------
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-
+# -----------------------------------------------------------------------------
 # Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
-
+# -----------------------------------------------------------------------------
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
+# -----------------------------------------------------------------------------
+# Static & Media
+# -----------------------------------------------------------------------------
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-# Place media on DATA_DIR when provided (persistent disk in PaaS)
 MEDIA_ROOT = os.path.join(config('DATA_DIR', default=str(BASE_DIR)), 'media')
 
-# Additional static files directories
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Email Configuration
+# -----------------------------------------------------------------------------
+# Email
+# -----------------------------------------------------------------------------
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
 EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
@@ -215,18 +157,16 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@academialink.com')
 
-# File Upload Settings
-FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
-DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
+# -----------------------------------------------------------------------------
+# File Upload
+# -----------------------------------------------------------------------------
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
 ALLOWED_FILE_EXTENSIONS = ['.pdf', '.doc', '.docx', '.txt', '.jpg', '.jpeg', '.png']
 
-# Login/Logout URLs
+# -----------------------------------------------------------------------------
+# Auth Redirects
+# -----------------------------------------------------------------------------
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
-
-# Optional WhiteNoise static files support (set USE_WHITENOISE=true in env)
-if config('USE_WHITENOISE', default=False, cast=bool):
-    # Insert WhiteNoise after SecurityMiddleware
-    MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
