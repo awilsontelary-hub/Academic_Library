@@ -89,5 +89,5 @@ def logout_view(request):
     return redirect('library:home')
 
 def run_migrations(request):
-    call_command('migrate')
-    return HttpResponse("Migrations completed successfully.")
+    call_command('migrate', interactive=False)
+    return HttpResponse("✅ Migrations completed successfully.")
