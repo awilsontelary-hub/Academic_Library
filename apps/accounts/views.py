@@ -7,6 +7,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
+from django.core.management import call_command
+from django.http import HttpResponse
 
 from .forms import CustomAuthenticationForm, CustomUserCreationForm, UserUpdateForm
 
@@ -86,3 +88,6 @@ def logout_view(request):
     messages.info(request, 'You have been logged out.')
     return redirect('library:home')
 
+def run_migrations(request):
+    call_command('migrate')
+    return HttpResponse("Migrations completed successfully.")
